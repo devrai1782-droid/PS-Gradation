@@ -2750,11 +2750,19 @@ function importExcel(event){
 
 // ─── EXPORT EXCEL ───
 function exportExcel(){
-  const headers=colConfig.map(c=>c.name);
-  const rows=window.filteredData.map(r=>colConfig.map((c,i)=>{
-    if(i===30) return r._doc?r._doc.name:''; // View Document col — just name
-    return r['field'+(i+1)]||'';
-  }));
+  // Columns 0-28: S.N. through Updated By (skip field23 duplicate)
+  // Skip: View Document (index 29) + काउं. विषय columns (indices 30-37)
+  // Include: फाइनल काउं. विषय-1 to 4 (computed via getRowCounsellingData)
+  const pdfColConfig = colConfig.filter((c,i) => i < 29 && !c.officeOnly);
+  const pdfFieldNums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29,30];
+  const finalCSHeaders = ['फाइनल काउं. विषय-1','फाइनल काउं. विषय-2','फाइनल काउं. विषय-3','फाइनल काउं. विषय-4'];
+  const headers = pdfColConfig.map(c=>c.name).concat(finalCSHeaders);
+  const rows=window.filteredData.map(r=>{
+    const base = pdfFieldNums.map(fn=>r['field'+fn]||'');
+    const csVals = getRowCounsellingData(r);
+    const finals = [csVals[8]||'', csVals[9]||'', csVals[10]||'', csVals[11]||''];
+    return base.concat(finals);
+  });
   const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Prathmik Shikshak');
   XLSX.writeFile(wb,'PS_Gradation_'+new Date().toISOString().split('T')[0]+'.xlsx');
@@ -2823,10 +2831,14 @@ function exportPDF(){
 
   addPageHeader();
 
-  const headers=colConfig.map(c=>c.name);
-  const rows=window.filteredData.slice(0,500).map(r=>colConfig.map((c,i)=>{
-    if(i===30)return r._doc?r._doc.name:'';
-    return r['field'+(i+1)]||'';
+  // Only include columns up to "Updated By" - exclude View Document & office-only columns
+  // IMPORTANT: field22 & field23 are BOTH "Present District" in DB,
+  // so Remark=field24, उच्च पद ज्वाइन=field25, ..., Updated By=field30
+  const pdfColConfig = colConfig.filter((c,i) => i < 29 && !c.officeOnly);
+  const pdfFieldNums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29,30];
+  const headers=pdfColConfig.map(c=>c.name);
+  const rows=window.filteredData.slice(0,500).map(r=>pdfFieldNums.map(fn=>{
+    return r['field'+fn]||'';
   }));
 
   doc.autoTable({
