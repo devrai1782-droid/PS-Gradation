@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,11 +127,11 @@ tr:nth-child(even){background:#fcfcfd;}tr:hover td{background:#f1f7ff!important;
 .field-group{display:flex;flex-direction:column;gap:0;}
 
 /* Row item — exact UMS style */
-.row-item{display:flex;border:1px solid rgba(255,255,255,.25);height:28px;background:rgba(255,255,255,.07);margin-bottom:2px;position:relative;overflow:visible;}
-.row-item.tall{height:auto;min-height:28px;}
-.f-num{width:26px;min-width:26px;background:#000;display:flex;align-items:center;justify-content:center;font-size:.82em;font-weight:bold;border-right:1px solid rgba(255,255,255,.3);flex-shrink:0;color:white;}
-.f-label{flex:1;font-size:.63em;font-weight:bold;padding:0 5px;display:flex;align-items:center;text-transform:uppercase;line-height:1.1;overflow:hidden;min-width:0;color:white;}
-.f-input{width:190px;border:none;padding:2px 6px;font-weight:bold;font-size:.88em;color:#000;outline:none;background:#fff;height:28px;box-sizing:border-box;flex-shrink:0;}
+.row-item{display:flex;border:1px solid rgba(255,255,255,.25);height:32px;background:rgba(255,255,255,.07);margin-bottom:2px;position:relative;overflow:visible;}
+.row-item.tall{height:auto;min-height:32px;}
+.f-num{width:28px;min-width:28px;background:#000;display:flex;align-items:center;justify-content:center;font-size:1em;font-weight:bold;border-right:1px solid rgba(255,255,255,.3);flex-shrink:0;color:white;}
+.f-label{flex:1;font-size:.86em;font-weight:bold;padding:0 6px;display:flex;align-items:center;text-transform:uppercase;line-height:1.1;overflow:hidden;min-width:0;color:white;}
+.f-input{width:190px;border:none;padding:2px 6px;font-weight:bold;font-size:1.04em;color:#000;outline:none;background:#fff;height:32px;box-sizing:border-box;flex-shrink:0;}
 .f-input[readonly],.f-input:disabled{background:#e0e0e0;cursor:not-allowed;color:#555;}
 .f-input:focus{background:#fffde7;}
 select.f-input{cursor:pointer;}
@@ -278,11 +277,11 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
 
   /* Form inputs */
   .f-input,.ms-container{width:100%!important;max-width:100%!important;box-sizing:border-box;}
-  .f-input{height:32px;font-size:.9em;}
-  .row-item{height:auto;min-height:30px;flex-wrap:nowrap;}
+  .f-input{height:36px;font-size:.95em;}
+  .row-item{height:auto;min-height:34px;flex-wrap:nowrap;}
   .row-item.tall{height:auto;}
-  .f-label{font-size:.6em;min-width:80px;}
-  .f-num{width:22px;min-width:22px;font-size:.75em;}
+  .f-label{font-size:.68em;min-width:80px;}
+  .f-num{width:24px;min-width:24px;font-size:.82em;}
 
   /* Multi-select dropdown */
   .ms-options{width:100%;left:0;}
@@ -357,8 +356,8 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
 @media (hover:none) and (pointer:coarse){
   .btn,.otb-item{min-height:36px;}
   td{padding:5px 4px;}
-  .f-input{height:34px;}
-  select.f-input{height:34px;}
+  .f-input{height:36px;}
+  select.f-input{height:36px;}
 }
 </style>
 </head>
@@ -575,9 +574,9 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
         <button class="otb-item" onclick="document.getElementById('excelFile').click();closeOtherToolbar();">📥 IMPORT EXCEL</button>
         <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
         <button class="otb-item" onclick="exportExcel();closeOtherToolbar();">💾 EXPORT EXCEL</button>
-        <button class="otb-item" onclick="const cu=window.currentUser||'';if(cu!=='DPI'&&!cu.startsWith('JD')){alert('⛔ Sirf JD aur DPI paste kar sakte hain.');return;}const pw=prompt('🔐 Password darj karein:');if(pw!=='1782'){alert('❌ Galat password!');return;}openPasteDataModal();closeOtherToolbar();" style="color:#0d47a1;font-weight:700;">📋 PASTE DATA</button>
+        <button class="otb-item" onclick="(function(){const cu=window.currentUser||'';if(cu!=='DPI'&&!cu.startsWith('JD')){alert('⛔ Sirf JD aur DPI paste kar sakte hain.');return;}const enteredPw=prompt('🔐 Password darj karein (अपना login password):');if(enteredPw===null)return;const correctPw=getEffectivePassword(cu)||'1782';if(enteredPw!==correctPw){alert('❌ Galat password! Login password dalein.');return;}openPasteDataModal();closeOtherToolbar();})()" style="color:#0d47a1;font-weight:700;">📋 PASTE DATA</button>
         <div style="padding:4px 14px 6px;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;margin:6px 0 4px;">DATA MANAGEMENT</div>
-        <button class="otb-item" onclick="const cu=window.currentUser||'';if(cu!=='DPI'&&!cu.startsWith('JD')){alert('⛔ Sirf JD aur DPI clear kar sakte hain.');return;}const pw=prompt('🔐 Password darj karein:');if(pw!=='1782'){alert('❌ Galat password!');return;}clearAllData();closeOtherToolbar();" style="color:#c62828;">🗑 CLEAR ALL DATA</button>
+        <button class="otb-item" onclick="(function(){const cu=window.currentUser||'';if(cu!=='DPI'&&!cu.startsWith('JD')){alert('⛔ Sirf JD aur DPI clear kar sakte hain.');return;}const enteredPw=prompt('🔐 Password darj karein (अपना login password):');if(enteredPw===null)return;const correctPw=getEffectivePassword(cu)||'1782';if(enteredPw!==correctPw){alert('❌ Galat password! Login password dalein.');return;}clearDivisionData();closeOtherToolbar();})()" style="color:#c62828;">🗑 CLEAR ALL DATA</button>
         <button id="pwPanelBtn" class="otb-item" onclick="openPwPanel();closeOtherToolbar();" style="display:none;color:#4a148c;font-weight:700;">🔑 PASSWORD PANEL</button>
         <button class="otb-item" onclick="openPwResetLog();closeOtherToolbar();" style="color:#6a1b9a;">🔐 PASSWORD RESET LOG</button>
         <div style="padding:4px 14px 6px;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;margin:6px 0 4px;">ZOOM</div>
@@ -606,7 +605,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
   </div>
 
   <div class="sheet-title" id="sheetTitleBar" style="position:relative;display:flex;align-items:center;justify-content:center;gap:10px;">
-    <span id="sheetTitleText">प्राथमिक शिक्षक (Prathmik Shikshak) राज्य स्तरीय अनंतिम वरीयता सूची — 01/04/2025 की स्थिति में</span>
+    <span id="sheetTitleText">प्राथमिक शिक्षक (Prathmik Shikshak) राज्य स्तरीय अनंतिम वरीयता सूची — 01/04/2026 की स्थिति में</span>
     <button id="sheetTitleEditBtn" onclick="openTitleEditor()" title="Title Edit करें (Only DPI)" style="display:none;background:#002e5b;color:white;border:none;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✏️ Edit</button>
   </div>
 
@@ -688,6 +687,12 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
         <div class="f-num">1</div>
         <div class="f-label">S.NO.</div>
         <input type="text" id="in1" class="f-input" readonly tabindex="-1" style="background:#bdc3c7;color:#000;font-weight:bold;">
+      </div>
+
+      <div class="row-item">
+        <div class="f-num" style="background:#1b5e20;">G</div>
+        <div class="f-label">GRADATION NUMBER</div>
+        <input type="text" id="inGradNo" class="f-input" readonly tabindex="-1" value="New Entry" style="background:#e8f5e9;color:#1b5e20;font-weight:bold;cursor:not-allowed;">
       </div>
 
       <div class="row-item">
@@ -1337,7 +1342,7 @@ function isRowAllowed(row, allowedDistricts){
 
 // ─── 28 COLUMN CONFIG ───
 const colConfig = [
-  {name:"S.N.",cls:"col-xs",fi:1},{name:"Unique ID",cls:"col-sm",fi:2},{name:"Name",cls:"col-lg",fi:3},
+  {name:"S.N.",cls:"col-xs",fi:1},{name:"Grad. No.",cls:"col-sm",gradNo:true},{name:"Unique ID",cls:"col-sm",fi:2},{name:"Name",cls:"col-lg",fi:3},
   {name:"Category",cls:"col-sm",fi:4},{name:"Gender",cls:"col-sm",fi:5},{name:"Date of Birth",cls:"col-md",fi:6},
   {name:"Prof. Qual.",cls:"col-md",fi:7},{name:"UG Qual-1",cls:"col-sm",fi:8},
   {name:"UG1 Sub-1",cls:"col-md",fi:9},{name:"UG1 Sub-2",cls:"col-md",fi:10},{name:"UG1 Sub-3",cls:"col-md",fi:11},
@@ -1558,9 +1563,11 @@ function checkLockStatus(){
   // ✅ RULE 1: DPI hamesha exempt — kabhi lock nahi hoga
   const cu=window.currentUser||currentUser||null;
   if(cu==='DPI'){document.getElementById('lockScreen').style.display='none';return;}
-  // ✅ RULE 2: Koi logged in nahi hai to lockScreen mat dikhao
+  // ✅ RULE 2: JD bhi exempt — kabhi lock nahi hoga
+  if(cu&&cu.startsWith('JD')){document.getElementById('lockScreen').style.display='none';return;}
+  // ✅ RULE 3: Koi logged in nahi hai to lockScreen mat dikhao
   if(!cu){document.getElementById('lockScreen').style.display='none';return;}
-  // ✅ RULE 3: Sirf JD aur DEO ke liye date check karo
+  // ✅ RULE 4: Sirf DEO ke liye date check karo
   const s=window._psStart,e=window._psEnd;
   if(!s||!e)return;
   const today=new Date().toISOString().split('T')[0];
@@ -2071,7 +2078,12 @@ function runAllFilters(){
   window.filteredData=window.fullData.filter(row=>inputs.every(inp=>{
     const f=inp.value.trim().toLowerCase();if(!f)return true;
     const ci=parseInt(inp.dataset.colIdx||'0');
-    const fi = colConfig[ci] && colConfig[ci].fi !== undefined ? colConfig[ci].fi : (ci+1);
+    const col = colConfig[ci];
+    if(col && col.gradNo){
+      const st=row.field29||'';const isNew=!st||st.includes('New');
+      return (isNew?'new entry':'updated').includes(f);
+    }
+    const fi = col && col.fi !== undefined ? col.fi : (ci+1);
     if(fi===31)return(row._doc&&row._doc.name||'').toLowerCase().includes(f);
     return(row['field'+fi]||'').toString().toLowerCase().includes(f);
   }));renderVirtual();
@@ -2163,6 +2175,11 @@ function _buildPSRow(row, i){
       if(row._softDeleted) td.innerHTML='<span class="badge badge-deleted">DELETED</span>';
       else td.textContent = String(i+1);
     }
+    else if(colConfig[ci].gradNo){
+      const st=row.field29||'';
+      const isNew=!st||st.includes('New');
+      td.innerHTML=`<span style="background:${isNew?'#1b5e20':'#1565c0'};color:white;padding:1px 6px;border-radius:2px;font-size:10px;font-weight:700;">${isNew?'New Entry':'Updated'}</span>`;
+    }
     else if(fi===5&&(val==='M'||val==='F')){
       td.innerHTML=`<span style="background:${val==='M'?'#1565c0':'#ad1457'};color:white;padding:1px 6px;border-radius:2px;font-size:10px;font-weight:700;">${val}</span>`;
     }
@@ -2209,8 +2226,22 @@ function _buildPSRow(row, i){
       const dispVal=isDateCol?fmtDate(val):val;
       const cf=row._changedFields&&row._changedFields[fi];
       if(cf!==undefined&&cf!==null&&cf.from!==val){
-        td.innerHTML=`<span style="background:#fff3cd;padding:1px 3px;border-radius:2px;" title="Was: ${fmtDate(cf.from)||'(empty)'}">${dispVal}</span>`;
-        td.classList.add('cell-changed');
+        // ── Field 7 (Professional Qualification) — multi-select comma field ──
+        // Puri cell highlight mat karo, sirf naye add hue items highlight karo
+        if(fi===7){
+          const oldItems=new Set((cf.from||'').split(/[\/,]/).map(s=>s.trim().toLowerCase()).filter(Boolean));
+          const newItems=(val||'').split(/[\/,]/).map(s=>s.trim()).filter(Boolean);
+          const html=newItems.map(item=>
+            !oldItems.has(item.toLowerCase())
+              ?`<span style="background:#fff3cd;padding:1px 5px;border-radius:3px;border:1px solid #ff9800;font-weight:700;color:#b45309;" title="Naya add hua">✦ ${item}</span>`
+              :item
+          ).join(', ');
+          td.innerHTML=html;
+          // NOTE: cell-changed (puri cell ka border/background) NAHI lagana — sirf item-level highlight
+        } else {
+          td.innerHTML=`<span style="background:#fff3cd;padding:1px 3px;border-radius:2px;" title="Was: ${fmtDate(cf.from)||'(empty)'}">${dispVal}</span>`;
+          td.classList.add('cell-changed');
+        }
       } else {
         td.textContent=dispVal;
       }
@@ -2348,7 +2379,8 @@ function updateMS7(){
 function setMS7Value(val){
   document.querySelectorAll('#ms7Options input[type=checkbox]').forEach(cb=>cb.checked=false);
   if(!val){document.getElementById('ms7Text').textContent='SELECT';document.getElementById('in7').value='';return;}
-  const parts=val.split(',').map(s=>s.trim());
+  // Split by both ' / ' (saved format) and ',' (old format) — dono support karo
+  const parts=val.split(/[\/,]/).map(s=>s.trim()).filter(Boolean);
   document.querySelectorAll('#ms7Options input[type=checkbox]').forEach(cb=>{
     if(parts.includes(cb.value))cb.checked=true;
   });
@@ -2369,13 +2401,14 @@ function handleTransferMode(){const mode=document.getElementById('in19mode').val
 
 // ─── UG SUBJECT MAPPING ───
 const ugSubjectMap = {
-  'B.A.'           : ['Hindi Literature','English Literature','Sanskrit Literature','History','Geography','Political Science','Economics','Sociology','Psychology','Home Science','Urdu Literature'],
+  'B.A.'           : ['Hindi Literature','English Literature','Sanskrit Literature','History','Geography','Political Science','Economics','Sociology','Psychology','Home Science','Urdu Literature','Maths'],
   'B.Sc. In Maths' : ['Maths','Physics','Chemistry','Computer Science'],
   'B.Sc. In Science': ['Physics','Chemistry','Biology','Botany','Zoology'],
-  'B.Com.'         : ['Commerce','Economics'],
-  'BCA'            : ['Computer Science','Maths'],
-  'BBA'            : ['Commerce','Economics'],
-  'B.Tech.'        : ['Physics','Chemistry','Maths','Computer Science'],
+  'B.Com.'         : ['Financial Accounting','Cost Accounting','Management Accounting','Business Economics','Microeconomics','Macroeconomics','Business Law','Company Law','Financial Management','Business Mathematics','Statistics','Income Tax','Auditing','Banking and Insurance','Computer Applications','Business Studies'],
+  'BCA'            : ['C Programming','Java Programming','Python Programming','Database Management System','Data Structures','Operating System','Computer Networks','Software Engineering','Web Development','Discrete Mathematics','Computer Fundamentals','Computer Organization','Statistics'],
+  'BBA'            : ['Principles of Management','Business Economics','Financial Accounting','Business Mathematics','Business Law','Marketing Management','Human Resource Management','Financial Management','Organizational Behavior','Business Communication','Operations Management','Entrepreneurship Development','Statistics','Computer Applications'],
+  'B.Tech.'        : ['Engineering Mathematics','Engineering Physics','Engineering Chemistry','Basic Electrical Engineering','Basic Electronics Engineering','Engineering Mechanics','Computer Programming','Data Structures','Operating System','Computer Networks','Database Management System','Software Engineering','Environmental Studies','Engineering Graphics'],
+  'B.E.'           : ['Engineering Mathematics','Engineering Physics','Engineering Chemistry','Basic Electrical Engineering','Basic Electronics Engineering','Engineering Mechanics','Computer Programming','Data Structures','Operating System','Computer Networks','Database Management System','Software Engineering','Environmental Studies','Engineering Graphics'],
   'NIL'            : ['NIL'],
 };
 const allSubjects = ['Biology','Botany','Chemistry','Commerce','Computer Science','Economics','English Literature','Geography','Hindi Literature','History','Home Science','Maths','Physics','Political Science','Psychology','Sanskrit Literature','Sociology','Urdu Literature','Zoology'];
@@ -3159,6 +3192,9 @@ function loadRecord(uid){
   if((rec.field25||'').toUpperCase()==='YES'){document.getElementById('in26').value=rec.field26||'';document.getElementById('in27').value=rec.field27||'';}
   // Updated by
   document.getElementById('inUpdatedBy').value=rec.field30||rec._updatedBy||'';
+  // Gradation Number field
+  const gnEl=document.getElementById('inGradNo');
+  if(gnEl){const st=rec.field29||'';gnEl.value=!st||st.includes('New')?'New Entry':'Updated';}
   // Doc display
   const fnd=document.getElementById('fileNameDisplay');
   if(fnd){
@@ -3207,6 +3243,7 @@ function clearForm(){
   ['inCS1','inCS2','inCS3','inCS4','inDS1','inDS2','inDS3','inDS4','inFS1','inFS2','inFS3','inFS4'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('retirementField').value='';
   document.getElementById('inUpdatedBy').value='';
+  const gnEl2=document.getElementById('inGradNo');if(gnEl2)gnEl2.value='New Entry';
   document.getElementById('in19mode').value='DATE';
   document.getElementById('in19').disabled=false;document.getElementById('in19').style.background='';
   document.getElementById('formStatusBadge').textContent='NEW ENTRY';
@@ -3273,7 +3310,7 @@ function exportExcel(){
 // ─── PDF EXPORT ───
 function exportPDF(){
   const{jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3'});
+  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   const pw=doc.internal.pageSize.getWidth();
   const ph=doc.internal.pageSize.getHeight();
 
@@ -3282,18 +3319,18 @@ function exportPDF(){
   const logoSrc=logoEl?logoEl.src:null;
 
   // ── Draw header on each page ──
-  const HEADER_H=30; // total header height in mm
+  const HEADER_H=38; // total header height in mm (increased for bigger logo)
   const addPageHeader=function(){
-    // White background bar
+    // Navy background bar
     doc.setFillColor(0,46,91);
     doc.rect(0,0,pw,HEADER_H,'F');
 
-    // Logo on left (large, clear)
+    // Logo on left (BIGGER - 34x34 mm)
     if(logoSrc){
       try{
-        doc.addImage(logoSrc,'PNG',4,2,24,24);
+        doc.addImage(logoSrc,'PNG',2,2,34,34);
       }catch(e){
-        try{doc.addImage(logoSrc,'JPEG',4,2,24,24);}catch(e2){}
+        try{doc.addImage(logoSrc,'JPEG',2,2,34,34);}catch(e2){}
       }
     }
 
@@ -3301,20 +3338,20 @@ function exportPDF(){
     doc.setTextColor(255,255,255);
     doc.setFontSize(14);
     doc.setFont('helvetica','bold');
-    doc.text('Prathmik Shikshak Varishthata Suchi (Gradation List) - 01/04/2025',pw/2,11,{align:'center'});
+    doc.text('Prathmik Shikshak Varishthata Suchi (Gradation List) - 01/04/2026',pw/2,13,{align:'center'});
 
     // Sub title
     doc.setFontSize(9);
     doc.setFont('helvetica','normal');
-    doc.text('Directorate of Public Instructions (DPI), Madhya Pradesh',pw/2,18,{align:'center'});
+    doc.text('Directorate of Public Instructions (DPI), Madhya Pradesh',pw/2,21,{align:'center'});
 
     // Generated date on right
     doc.setFontSize(8);
-    doc.text('Generated: '+new Date().toLocaleString('en-IN'),pw-6,26,{align:'right'});
+    doc.text('Generated: '+new Date().toLocaleString('en-IN'),pw-6,30,{align:'right'});
 
     // Total records info
     const totalRecs=window.filteredData?window.filteredData.length:0;
-    doc.text('Total Records: '+totalRecs,6,26);
+    doc.text('Total Records: '+totalRecs,40,30);
 
     // Reset text color
     doc.setTextColor(0,0,0);
@@ -3322,7 +3359,7 @@ function exportPDF(){
     // Watermark logo (faint, centered)
     if(logoSrc){
       try{
-        const wSize=60;
+        const wSize=70;
         const wx=(pw-wSize)/2, wy=(ph-wSize)/2;
         doc.setGState(new doc.GState({opacity:0.05}));
         doc.addImage(logoSrc,'PNG',wx,wy,wSize,wSize);
@@ -3352,10 +3389,10 @@ function exportPDF(){
     head:[headers],
     body:rows,
     startY:HEADER_H+2,
-    styles:{fontSize:6,cellPadding:1,font:'helvetica'},
-    headStyles:{fillColor:[0,46,91],textColor:[255,255,255],fontStyle:'bold',fontSize:6.5},
+    styles:{fontSize:5.5,cellPadding:0.8,font:'helvetica'},
+    headStyles:{fillColor:[0,46,91],textColor:[255,255,255],fontStyle:'bold',fontSize:6},
     alternateRowStyles:{fillColor:[240,245,255]},
-    margin:{left:4,right:4},
+    margin:{left:3,right:3},
     didDrawPage:function(data){
       // Redraw header on every new page
       if(data.pageNumber>1){addPageHeader();}
@@ -3460,7 +3497,7 @@ async function psSummaryViewDoc(officeKey){
   popup.addEventListener('click', e=>{ if(e.target===popup) popup.remove(); });
 }
 
-// ─── SUMMARY (UMS STYLE — exact match) ───
+// ─── SUMMARY (MULTI-TAB — सभी समरी एक बटन में) ───
 function showSummary(){
   const cu = window.currentUser||'';
   const allowedDist = getAllowedDistricts(cu);
@@ -3477,7 +3514,6 @@ function showSummary(){
     {name:'JD SHAHDOL',      key:'JDSHAHDOL',      districts:['Anuppur','Shahdol','Umaria']}
   ];
 
-  // JD division map for canUpload check
   const jdDivisionMap = {
     'JDBHOPAL':['BHOPAL','RAISEN','RAJGARH','SEHORE','VIDISHA'],
     'JDGWALIOR':['ASHOKNAGAR','BHIND','DATIA','GUNA','GWALIOR','MORENA','SHEOPUR','SHIVPURI'],
@@ -3502,9 +3538,10 @@ function showSummary(){
   const rows = window.fullData||[];
   if(!rows.length) return myAlert('❌ No data available to generate summary.');
 
-  // Count per district — field23=Present District, field29=Status, field30=Updated By
+  // ── Helper: count rows for a district ──
   function countRows(distName){
-    let total=0,updated=0,newEntry=0,deleted=0,deo=0,jd=0,dpi=0;
+    let total=0,updated=0,newEntry=0,deleted=0,deo=0,jd=0,dpi=0,male=0,female=0;
+    let sc=0,st=0,obc=0,ur=0;
     const dl=distName.trim().toLowerCase();
     rows.forEach(row=>{
       const f22=(row.field23||'').trim().toLowerCase();
@@ -3512,131 +3549,377 @@ function showSummary(){
       total++;
       const status=(row.field29||'').trim();
       const f30=(row.field30||'').trim();
-      // Status exact match
       if(row._softDeleted||status==='Deleted') deleted++;
       else if(status==='Updated') updated++;
-      else newEntry++; // 'New Entry' या blank — दोनों newEntry
-      // Who — "New Entry by DPI | ..." या "Updated by JDBHOPAL | ..."
+      else newEntry++;
       const byMatch=f30.match(/\bby\s+(\S+)/i);
       if(byMatch){
         const who=byMatch[1].toUpperCase();
         if(who==='DPI') dpi++;
         else if(who.startsWith('JD')) jd++;
         else if(who.startsWith('DEO')) deo++;
-        else dpi++; // अगर कोई match नहीं तो DPI
+        else dpi++;
       }
+      const gender=(row.field5||'').trim().toUpperCase();
+      if(gender==='M') male++;
+      else if(gender==='F') female++;
+      const cat=(row.field4||'').trim().toUpperCase();
+      if(cat==='SC') sc++;
+      else if(cat==='ST') st++;
+      else if(cat==='OBC') obc++;
+      else if(cat==='UR'||cat==='GEN'||cat==='GENERAL') ur++;
     });
-    return{total,updated,newEntry,deleted,deo,jd,dpi};
+    return{total,updated,newEntry,deleted,deo,jd,dpi,male,female,sc,st,obc,ur};
   }
 
-  let grand={total:0,updated:0,new:0,deleted:0,deo:0,jd:0,dpi:0};
+  // ── Build district-level and JD-level aggregates ──
+  let grand={total:0,updated:0,new:0,deleted:0,deo:0,jd:0,dpi:0,male:0,female:0,sc:0,st:0,obc:0,ur:0};
   let finalData=[];
 
   structure.forEach(div=>{
-    let divStats={name:div.name,key:div.key,type:'JD',total:0,updated:0,new:0,deleted:0,deo:0,jd:0,dpi:0};
+    let ds={name:div.name,key:div.key,type:'JD',total:0,updated:0,new:0,deleted:0,deo:0,jd:0,dpi:0,male:0,female:0,sc:0,st:0,obc:0,ur:0};
     let districtRows=[];
     div.districts.forEach(d=>{
       const c=countRows(d);
       const deoKey='DEO'+d.replace(/\s+/g,'').toUpperCase();
       if(c.total>0){
-        districtRows.push({name:d,key:deoKey,type:'DISTRICT',total:c.total,updated:c.updated,new:c.newEntry,deleted:c.deleted,deo:c.deo,jd:c.jd,dpi:c.dpi});
-        divStats.total+=c.total;divStats.updated+=c.updated;divStats.new+=c.newEntry;divStats.deleted+=c.deleted;
-        divStats.deo+=c.deo;divStats.jd+=c.jd;divStats.dpi+=c.dpi;
+        districtRows.push({name:d,key:deoKey,type:'DISTRICT',
+          total:c.total,updated:c.updated,new:c.newEntry,deleted:c.deleted,
+          deo:c.deo,jd:c.jd,dpi:c.dpi,
+          male:c.male,female:c.female,sc:c.sc,st:c.st,obc:c.obc,ur:c.ur});
+        ds.total+=c.total;ds.updated+=c.updated;ds.new+=c.newEntry;ds.deleted+=c.deleted;
+        ds.deo+=c.deo;ds.jd+=c.jd;ds.dpi+=c.dpi;
+        ds.male+=c.male;ds.female+=c.female;ds.sc+=c.sc;ds.st+=c.st;ds.obc+=c.obc;ds.ur+=c.ur;
         grand.total+=c.total;grand.updated+=c.updated;grand.new+=c.newEntry;grand.deleted+=c.deleted;
         grand.deo+=c.deo;grand.jd+=c.jd;grand.dpi+=c.dpi;
+        grand.male+=c.male;grand.female+=c.female;grand.sc+=c.sc;grand.st+=c.st;grand.obc+=c.obc;grand.ur+=c.ur;
       }
     });
-    if(divStats.total>0){ finalData.push(divStats); finalData=finalData.concat(districtRows); }
+    if(ds.total>0){ finalData.push(ds); finalData=finalData.concat(districtRows); }
   });
+
+  // ── JD-level only array ──
+  const jdData = finalData.filter(x=>x.type==='JD');
+
+  // ── Tab HTML builders ──
+  const thStyle='padding:4px 6px;border:1px solid #000;white-space:nowrap;text-align:center;background:#002e5b;color:white;font-size:10px;font-weight:700;';
+  const thLStyle='padding:4px 8px;border:1px solid #000;white-space:nowrap;text-align:left;background:#002e5b;color:white;font-size:10px;font-weight:700;';
+  const tdStyle='padding:3px 5px;border:1px solid #ccc;text-align:center;font-size:10px;';
+  const tdLStyle='padding:3px 8px;border:1px solid #ccc;text-align:left;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+
+  // ── TAB 1: District-wise (original with upload/doc) ──
+  function buildTab1(){
+    return `<div style="border:2.5px solid #002e5b;border-radius:4px;overflow:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:11px;background:white;table-layout:fixed;min-width:680px;">
+      <colgroup>
+        <col style="width:18%">
+        <col style="width:6%">
+        <col style="width:7%">
+        <col style="width:8%">
+        <col style="width:7%">
+        <col style="width:5%">
+        <col style="width:5%">
+        <col style="width:5%">
+        <col style="width:17%">
+        <col style="width:17%">
+      </colgroup>
+      <thead><tr>
+        <th style="${thLStyle}">OFFICE NAME</th>
+        <th style="${thStyle}">TOTAL</th>
+        <th style="${thStyle}">UPDATED</th>
+        <th style="${thStyle}">NEW ENTRY</th>
+        <th style="${thStyle}color:#ff8a80;">DELETE</th>
+        <th style="${thStyle}color:#ff8a80;">DEO</th>
+        <th style="${thStyle}">JD</th>
+        <th style="${thStyle}">DPI</th>
+        <th style="${thStyle}background:#1b5e20;" class="no-print">📤 UPLOAD LIST</th>
+        <th style="${thStyle}background:#0d47a1;" class="no-print">👁️ VIEW DOC</th>
+      </tr></thead>
+      <tbody>
+      ${finalData.map(item=>{
+        const itemKey=item.key;
+        const districtKeyUp=item.name.replace(/\s+/g,'').toUpperCase();
+        const jdDistricts=jdDivisionMap[cu]||[];
+        const canUpload=(cu==='DPI')||(cu===itemKey)||jdDistricts.includes(districtKeyUp);
+        const uploadBtn=canUpload
+          ?`<button onclick="psSummaryUploadDoc('${itemKey}')" style="background:#2e7d32;color:white;border:none;padding:4px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-weight:bold;display:flex;align-items:center;gap:3px;margin:auto;">📤 Upload</button><div id='psUploadStatus_${itemKey}' style='font-size:9px;margin-top:2px;color:#555;'></div>`
+          :`<span style="color:#bbb;font-size:10px;">🔒</span>`;
+        const viewBtnId='psViewContainer_'+itemKey;
+        const viewBtn=`<div id="${viewBtnId}" style="text-align:center;"><span style="color:#aaa;font-size:9px;">⏳</span></div>`;
+        (async function(key,cId){
+          const doc=await psGetUploadedDocCloud(key);
+          const el=document.getElementById(cId);if(!el)return;
+          if(doc&&doc.public_url){
+            const b=document.createElement('button');
+            b.innerHTML='👁 View';
+            b.style.cssText='background:#1565c0;color:white;border:2px solid #1565c0;padding:4px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-weight:bold;';
+            b.onclick=(function(k2){return function(){psSummaryViewDoc(k2);};})(key);
+            el.innerHTML='';el.appendChild(b);
+          }else{el.innerHTML='<span style="color:#aaa;font-size:10px;font-style:italic;">No Document</span>';}
+        })(itemKey,viewBtnId);
+        const isJD=item.type==='JD';
+        const rowBg=isJD?'background:#dbeafe;font-weight:700;':'background:#fff;';
+        return `<tr style="${rowBg}border-bottom:1px solid #e0e0e0;">
+          <td style="${tdLStyle}${isJD?'color:#1e3a8a;font-weight:700;':''}">${isJD?'📂 '+item.name:'&nbsp;&nbsp;&nbsp;DEO '+item.name}</td>
+          <td style="${tdStyle}font-weight:700;">${item.total}</td>
+          <td style="${tdStyle}color:#2e7d32;">${item.updated}</td>
+          <td style="${tdStyle}color:#1565c0;">${item.new}</td>
+          <td style="${tdStyle}color:#c62828;font-weight:${item.deleted>0?'700':'400'};">${item.deleted}</td>
+          <td style="${tdStyle}color:#b71c1c;">${item.deo||0}</td>
+          <td style="${tdStyle}color:#1b5e20;">${item.jd||0}</td>
+          <td style="${tdStyle}color:#0d47a1;">${item.dpi||0}</td>
+          <td style="${tdStyle}" class="no-print"><input type="file" id="psFileUpload_${itemKey}" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="psHandleSummaryFileUpload(event,'${itemKey}')">${uploadBtn}</td>
+          <td style="${tdStyle}" class="no-print">${viewBtn}</td>
+        </tr>`;
+      }).join('')}
+      <tr style="background:#002e5b;color:white;font-weight:700;font-size:12px;">
+        <td style="padding:5px 8px;border:1px solid #fff;">🏆 कुल योग (Grand Total)</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.updated}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.new}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.deleted}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.deo}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.jd}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.dpi}</td>
+        <td class="no-print"></td><td class="no-print"></td>
+      </tr></tbody></table></div>`;
+  }
+  function buildTab2(){
+    const tblStyle='width:100%;border-collapse:collapse;font-size:11px;background:white;table-layout:fixed;';
+    return `<div style="border:2.5px solid #002e5b;border-radius:4px;overflow:auto;">
+    <table style="${tblStyle}min-width:600px;">
+      <colgroup><col style="width:28%"><col style="width:7%"><col style="width:8%"><col style="width:9%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:7%"></colgroup>
+      <thead><tr>
+        <th style="${thLStyle}">संभाग (Division)</th>
+        <th style="${thStyle}">कुल</th>
+        <th style="${thStyle}">Updated</th>
+        <th style="${thStyle}">New Entry</th>
+        <th style="${thStyle}color:#ff8a80;">Delete</th>
+        <th style="${thStyle}">पुरुष (M)</th>
+        <th style="${thStyle}">महिला (F)</th>
+        <th style="${thStyle}color:#ff8a80;">DEO</th>
+        <th style="${thStyle}">JD</th>
+        <th style="${thStyle}">DPI</th>
+      </tr></thead>
+      <tbody>
+      ${jdData.map((item,i)=>{
+        const bg=i%2===0?'#f0f4ff':'#fff';
+        return `<tr style="background:${bg};">
+          <td style="${tdLStyle}font-weight:700;color:#1e3a8a;">📂 ${item.name}</td>
+          <td style="${tdStyle}font-weight:700;">${item.total}</td>
+          <td style="${tdStyle}color:#2e7d32;">${item.updated}</td>
+          <td style="${tdStyle}color:#1565c0;">${item.new}</td>
+          <td style="${tdStyle}color:#c62828;">${item.deleted}</td>
+          <td style="${tdStyle}color:#1565c0;">${item.male||0}</td>
+          <td style="${tdStyle}color:#ad1457;">${item.female||0}</td>
+          <td style="${tdStyle}color:#b71c1c;">${item.deo||0}</td>
+          <td style="${tdStyle}color:#1b5e20;">${item.jd||0}</td>
+          <td style="${tdStyle}color:#0d47a1;">${item.dpi||0}</td>
+        </tr>`;
+      }).join('')}
+      <tr style="background:#002e5b;color:white;font-weight:700;">
+        <td style="padding:5px 8px;border:1px solid #fff;">🏆 कुल योग</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.updated}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.new}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.deleted}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.male}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.female}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.deo}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.jd}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.dpi}</td>
+      </tr></tbody></table></div>`;
+  }
+
+  // ── TAB 3: लिंगवार (Gender-wise) — district ──
+  function buildTab3(){
+    const tblStyle='width:100%;border-collapse:collapse;font-size:11px;background:white;table-layout:fixed;';
+    return `<div style="border:2.5px solid #002e5b;border-radius:4px;overflow:auto;">
+    <table style="${tblStyle}min-width:450px;">
+      <colgroup><col style="width:40%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup>
+      <thead><tr>
+        <th style="${thLStyle}">कार्यालय</th>
+        <th style="${thStyle}">कुल</th>
+        <th style="${thStyle}background:#1565c0;">पुरुष (M)</th>
+        <th style="${thStyle}background:#ad1457;">महिला (F)</th>
+        <th style="${thStyle}">M%</th>
+        <th style="${thStyle}">F%</th>
+      </tr></thead>
+      <tbody>
+      ${finalData.map(item=>{
+        const isJD=item.type==='JD';
+        const mPct=item.total>0?((item.male||0)/item.total*100).toFixed(1):'0.0';
+        const fPct=item.total>0?((item.female||0)/item.total*100).toFixed(1):'0.0';
+        return `<tr style="${isJD?'background:#dbeafe;font-weight:700;':'background:#fff;'}border-bottom:1px solid #e0e0e0;">
+          <td style="${tdLStyle}${isJD?'color:#1e3a8a;font-weight:700;':''}">${isJD?'📂 '+item.name:'&nbsp;&nbsp;&nbsp;DEO '+item.name}</td>
+          <td style="${tdStyle}font-weight:700;">${item.total}</td>
+          <td style="${tdStyle}color:#1565c0;font-weight:600;">${item.male||0}</td>
+          <td style="${tdStyle}color:#ad1457;font-weight:600;">${item.female||0}</td>
+          <td style="${tdStyle}"><div style="background:#bbdefb;height:14px;border-radius:2px;display:flex;align-items:center;padding:0 4px;font-size:9px;font-weight:700;color:#0d47a1;">${mPct}%</div></td>
+          <td style="${tdStyle}"><div style="background:#fce4ec;height:14px;border-radius:2px;display:flex;align-items:center;padding:0 4px;font-size:9px;font-weight:700;color:#880e4f;">${fPct}%</div></td>
+        </tr>`;
+      }).join('')}
+      <tr style="background:#002e5b;color:white;font-weight:700;">
+        <td style="padding:5px 8px;border:1px solid #fff;">🏆 कुल योग</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.male}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.female}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total>0?(grand.male/grand.total*100).toFixed(1):0}%</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total>0?(grand.female/grand.total*100).toFixed(1):0}%</td>
+      </tr></tbody></table></div>`;
+  }
+
+  // ── TAB 4: वर्गवार (Category-wise) — district ──
+  function buildTab4(){
+    const tblStyle='width:100%;border-collapse:collapse;font-size:11px;background:white;table-layout:fixed;';
+    return `<div style="border:2.5px solid #002e5b;border-radius:4px;overflow:auto;">
+    <table style="${tblStyle}min-width:420px;">
+      <colgroup><col style="width:40%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup>
+      <thead><tr>
+        <th style="${thLStyle}">कार्यालय</th>
+        <th style="${thStyle}">कुल</th>
+        <th style="${thStyle}background:#4a148c;">SC</th>
+        <th style="${thStyle}background:#1b5e20;">ST</th>
+        <th style="${thStyle}background:#e65100;">OBC</th>
+        <th style="${thStyle}background:#0d47a1;">UR/GEN</th>
+      </tr></thead>
+      <tbody>
+      ${finalData.map(item=>{
+        const isJD=item.type==='JD';
+        return `<tr style="${isJD?'background:#dbeafe;font-weight:700;':'background:#fff;'}border-bottom:1px solid #e0e0e0;">
+          <td style="${tdLStyle}${isJD?'color:#1e3a8a;font-weight:700;':''}">${isJD?'📂 '+item.name:'&nbsp;&nbsp;&nbsp;DEO '+item.name}</td>
+          <td style="${tdStyle}font-weight:700;">${item.total}</td>
+          <td style="${tdStyle}color:#4a148c;font-weight:600;">${item.sc||0}</td>
+          <td style="${tdStyle}color:#1b5e20;font-weight:600;">${item.st||0}</td>
+          <td style="${tdStyle}color:#e65100;font-weight:600;">${item.obc||0}</td>
+          <td style="${tdStyle}color:#0d47a1;font-weight:600;">${item.ur||0}</td>
+        </tr>`;
+      }).join('')}
+      <tr style="background:#002e5b;color:white;font-weight:700;">
+        <td style="padding:5px 8px;border:1px solid #fff;">🏆 कुल योग</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.sc}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.st}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.obc}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.ur}</td>
+      </tr></tbody></table></div>`;
+  }
+
+  // ── TAB 5: स्थितिवार (Status-wise) — district ──
+  function buildTab5(){
+    const tblStyle='width:100%;border-collapse:collapse;font-size:11px;background:white;table-layout:fixed;';
+    return `<div style="border:2.5px solid #002e5b;border-radius:4px;overflow:auto;">
+    <table style="${tblStyle}min-width:480px;">
+      <colgroup><col style="width:34%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:13%"><col style="width:13%"></colgroup>
+      <thead><tr>
+        <th style="${thLStyle}">कार्यालय</th>
+        <th style="${thStyle}">कुल</th>
+        <th style="${thStyle}background:#1b5e20;">New Entry</th>
+        <th style="${thStyle}background:#0d47a1;">Updated</th>
+        <th style="${thStyle}background:#b71c1c;">Deleted</th>
+        <th style="${thStyle}">New%</th>
+        <th style="${thStyle}">Upd%</th>
+      </tr></thead>
+      <tbody>
+      ${finalData.map(item=>{
+        const isJD=item.type==='JD';
+        const nPct=item.total>0?((item.new||0)/item.total*100).toFixed(1):'0.0';
+        const uPct=item.total>0?((item.updated||0)/item.total*100).toFixed(1):'0.0';
+        return `<tr style="${isJD?'background:#dbeafe;font-weight:700;':'background:#fff;'}border-bottom:1px solid #e0e0e0;">
+          <td style="${tdLStyle}${isJD?'color:#1e3a8a;font-weight:700;':''}">${isJD?'📂 '+item.name:'&nbsp;&nbsp;&nbsp;DEO '+item.name}</td>
+          <td style="${tdStyle}font-weight:700;">${item.total}</td>
+          <td style="${tdStyle}color:#2e7d32;font-weight:600;">${item.new||0}</td>
+          <td style="${tdStyle}color:#1565c0;font-weight:600;">${item.updated||0}</td>
+          <td style="${tdStyle}color:#c62828;font-weight:${(item.deleted||0)>0?'700':'400'};">${item.deleted||0}</td>
+          <td style="${tdStyle}"><div style="background:#e8f5e9;height:14px;border-radius:2px;display:flex;align-items:center;padding:0 4px;font-size:9px;font-weight:700;color:#1b5e20;">${nPct}%</div></td>
+          <td style="${tdStyle}"><div style="background:#e3f2fd;height:14px;border-radius:2px;display:flex;align-items:center;padding:0 4px;font-size:9px;font-weight:700;color:#0d47a1;">${uPct}%</div></td>
+        </tr>`;
+      }).join('')}
+      <tr style="background:#002e5b;color:white;font-weight:700;">
+        <td style="padding:5px 8px;border:1px solid #fff;">🏆 कुल योग</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.new}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.updated}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.deleted}</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total>0?(grand.new/grand.total*100).toFixed(1):0}%</td>
+        <td style="padding:5px 8px;border:1px solid #fff;text-align:center;">${grand.total>0?(grand.updated/grand.total*100).toFixed(1):0}%</td>
+      </tr></tbody></table></div>`;
+  }
 
   if(document.getElementById('summaryModal')) document.getElementById('summaryModal').remove();
 
-  const printCSS=`<style>@media print{body *{visibility:hidden;}#summaryModal,#summaryModal *{visibility:visible;}#summaryModal{position:absolute;left:0;top:0;width:auto!important;display:block!important;}.no-print{display:none!important;}table{width:auto!important;border-collapse:collapse!important;}th,td{border:1px solid black!important;padding:3px 6px!important;white-space:nowrap!important;}}</style>`;
-
   const modal=document.createElement('div');
   modal.id='summaryModal';
-  modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:20000;display:flex;align-items:center;justify-content:center;';
-  modal.innerHTML=printCSS+`
-  <div style="background:#000080;color:white;border-radius:8px;border:1px solid #ffffff;display:inline-block;max-height:90vh;overflow:hidden;width:fit-content;box-shadow:0 10px 30px rgba(0,0,0,0.35);">
-    <div style="background:linear-gradient(90deg,#2c3e50,#34495e);color:white;padding:10px;border-bottom:2px solid #1c2833;text-align:center;">
-      <h3 style="margin:0;font-size:15px;font-weight:600;letter-spacing:0.5px;">PS — District Enrollment Summary</h3>
-      <div style="margin-top:6px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-weight:bold;font-size:14px;">
-        <div style="background:#e3f2fd;padding:4px 12px;border:1px solid #000;border-radius:4px;color:black;">Total : ${grand.total}</div>
-        <div style="background:#e8f5e9;padding:4px 12px;border:1px solid #000;border-radius:4px;color:black;">Updated : ${grand.updated}</div>
-        <div style="background:#e1f5fe;padding:4px 12px;border:1px solid #000;border-radius:4px;color:black;">New Entry : ${grand.new}</div>
-        <div style="background:#ffebee;padding:4px 12px;border:1px solid #000;border-radius:4px;color:#b71c1c;">Delete : ${grand.deleted}</div>
-        <div style="background:#ffebee;padding:4px 12px;border:1px solid #000;border-radius:4px;color:#b71c1c;">DEO : ${grand.deo}</div>
-        <div style="background:#e8f5e9;padding:4px 12px;border:1px solid #000;border-radius:4px;color:#1b5e20;">JD : ${grand.jd}</div>
-        <div style="background:#e3f2fd;padding:4px 12px;border:1px solid #000;border-radius:4px;color:#0d47a1;">DPI : ${grand.dpi}</div>
+  modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.78);z-index:20000;display:flex;align-items:center;justify-content:center;padding:10px;box-sizing:border-box;';
+
+  modal.innerHTML=`
+  <style>
+    @media print{body *{visibility:hidden;}#summaryModal,#summaryModal *{visibility:visible;}#summaryModal{position:absolute;left:0;top:0;width:100%!important;height:auto!important;display:block!important;background:white!important;padding:20px!important;}.no-print{display:none!important;}}
+    .sm-tab-btn{padding:6px 14px;border:none;cursor:pointer;font-size:11px;font-weight:700;border-radius:4px 4px 0 0;transition:all .15s;white-space:nowrap;}
+    .sm-tab-btn.active{background:#002e5b;color:white;}
+    .sm-tab-btn:not(.active){background:#dce8f5;color:#002e5b;}
+    .sm-tab-btn:hover:not(.active){background:#b3d1f0;}
+    .sm-tab-pane{display:none;}
+    .sm-tab-pane.active{display:block;}
+  </style>
+  <div style="background:white;border-radius:10px;border:2px solid #334;width:96%;max-width:950px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,0.5);overflow:hidden;">
+
+    <!-- HEADER: centered title + badges -->
+    <div style="background:linear-gradient(135deg,#002e5b,#1a4a8a);color:white;padding:14px 20px 12px;flex-shrink:0;text-align:center;">
+      <div style="font-size:17px;font-weight:800;letter-spacing:0.5px;">PS — District Enrollment Summary</div>
+      <div style="font-size:10px;opacity:.75;margin-top:2px;">Prathmik Shikshak Gradation ERP 2026 — DPI Madhya Pradesh</div>
+      <!-- Badges row — large rectangular boxes -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;justify-content:center;">
+        <div style="background:white;border:2.5px solid #333;padding:5px 16px;border-radius:5px;font-size:13px;font-weight:800;color:#111;">Total : ${grand.total}</div>
+        <div style="background:white;border:2.5px solid #2e7d32;padding:5px 16px;border-radius:5px;font-size:13px;font-weight:800;color:#2e7d32;">Updated : ${grand.updated}</div>
+        <div style="background:white;border:2.5px solid #333;padding:5px 16px;border-radius:5px;font-size:13px;font-weight:800;color:#111;">New Entry : ${grand.new}</div>
+        <div style="background:#fff0f0;border:2.5px solid #c62828;padding:5px 16px;border-radius:5px;font-size:13px;font-weight:800;color:#c62828;">Delete : ${grand.deleted}</div>
+        <div style="background:#fff0f0;border:2.5px solid #c62828;padding:5px 16px;border-radius:5px;font-size:13px;font-weight:800;color:#c62828;">DEO : ${grand.deo}</div>
+        <div style="background:white;border:2.5px solid #555;padding:5px 16px;border-radius:5px;font-size:13px;font-weight:800;color:#333;">JD : ${grand.jd}</div>
+        <div style="background:#f0f4ff;border:2.5px solid #1565c0;padding:5px 16px;border-radius:5px;font-size:13px;font-weight:800;color:#1565c0;">DPI : ${grand.dpi}</div>
       </div>
     </div>
-    <div style="overflow-y:auto;max-height:65vh;padding:10px;display:block;width:100%;">
-      <table style="width:1px!important;min-width:100%!important;border-collapse:collapse;font-size:11px;border:1px solid #000;margin:0 auto;background:white;">
-        <thead style="background:#f2f2f2;color:#000;font-weight:bold;">
-          <tr>
-            <th style="padding:4px 10px;text-align:left;border:1px solid #000;white-space:nowrap;">Office Name</th>
-            <th style="padding:4px 8px;border:1px solid #000;white-space:nowrap;">Total</th>
-            <th style="padding:4px 8px;border:1px solid #000;white-space:nowrap;">Updated</th>
-            <th style="padding:4px 8px;border:1px solid #000;white-space:nowrap;">New Entry</th>
-            <th style="padding:4px 8px;border:1px solid #000;white-space:nowrap;">Delete</th>
-            <th style="padding:4px 8px;border:1px solid #000;white-space:nowrap;color:#b71c1c;">DEO</th>
-            <th style="padding:4px 8px;border:1px solid #000;white-space:nowrap;color:#1b5e20;">JD</th>
-            <th style="padding:4px 8px;border:1px solid #000;white-space:nowrap;color:#0d47a1;">DPI</th>
-            <th style="padding:4px 8px;border:1px solid #000;background:#e8f5e9;white-space:nowrap;" class="no-print">📤 Upload List</th>
-            <th style="padding:4px 8px;border:1px solid #000;background:#e3f2fd;white-space:nowrap;" class="no-print">👁️ View Doc</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${finalData.map(item=>{
-            const itemKey = item.key;
-            const districtKeyUp = item.name.replace(/\s+/g,'').replace(/AGARMALWA/,'AGARMALWA').toUpperCase();
-            const jdDistricts = jdDivisionMap[cu]||[];
-            const canUpload = (cu==='DPI')||(cu===itemKey)||jdDistricts.includes(districtKeyUp);
-            let uploadBtn = canUpload
-              ? `<button onclick="psSummaryUploadDoc('${itemKey}')" style="background:#2e7d32;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:bold;">📤 Upload</button><div id='psUploadStatus_${itemKey}' style='font-size:10px;margin-top:2px;color:#555;'></div>`
-              : `<span style="color:#bbb;font-size:10px;">🔒 No Access</span>`;
-            const viewBtnId = 'psViewContainer_'+itemKey;
-            let viewBtn = `<div id="${viewBtnId}"><span style="color:#aaa;font-size:10px;font-style:italic;">⏳</span></div>`;
-            (async function(key,cId){
-              const doc = await psGetUploadedDocCloud(key);
-              const el = document.getElementById(cId);
-              if(!el) return;
-              if(doc && doc.public_url){
-                const b = document.createElement('button');
-                b.textContent = '👁️ View';
-                b.style.cssText = 'background:#1565c0;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:bold;';
-                b.onclick = (function(k2){ return function(){ psSummaryViewDoc(k2); }; })(key);
-                el.innerHTML=''; el.appendChild(b);
-              } else {
-                el.innerHTML='<span style="color:#aaa;font-size:10px;font-style:italic;">No Document</span>';
-              }
-            })(itemKey, viewBtnId);
 
-            return `<tr style="border-bottom:1px solid #000;${item.type==='JD'?'background:#e8f1ff;font-weight:600;color:#0d47a1;':''}">
-              <td style="padding:2px 10px;border-right:1px solid #000;white-space:nowrap;color:black!important;">${item.type==='JD'?item.name:'DEO '+item.name}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;font-weight:bold;color:black!important;">${item.total}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;color:#2e7d32;">${item.updated}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;color:#1565c0;">${item.new}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;color:#c62828;font-weight:600;">${item.deleted}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;color:#b71c1c;">${item.deo||0}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;color:#1b5e20;">${item.jd||0}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;color:#0d47a1;">${item.dpi||0}</td>
-              <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;" class="no-print">
-                <input type="file" id="psFileUpload_${itemKey}" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="psHandleSummaryFileUpload(event,'${itemKey}')">
-                ${uploadBtn}
-              </td>
-              <td style="padding:2px 8px;text-align:center;" class="no-print">${viewBtn}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>
+    <!-- TAB BAR -->
+    <div style="display:flex;gap:3px;padding:6px 10px 0;background:#f0f4f8;border-bottom:2px solid #002e5b;flex-shrink:0;flex-wrap:wrap;">
+      <button class="sm-tab-btn active" id="smTab1" onclick="smSwitchTab(1)">🗂️ जिलेवार समरी</button>
+      <button class="sm-tab-btn" id="smTab2" onclick="smSwitchTab(2)">🏛️ संभागवार</button>
+      <button class="sm-tab-btn" id="smTab3" onclick="smSwitchTab(3)">👥 लिंगवार</button>
+      <button class="sm-tab-btn" id="smTab4" onclick="smSwitchTab(4)">🏷️ वर्गवार</button>
+      <button class="sm-tab-btn" id="smTab5" onclick="smSwitchTab(5)">📋 स्थितिवार</button>
     </div>
-    <div class="no-print" style="padding:10px;background:#f5f6fa;text-align:right;border-top:1px solid #ddd;">
-      <button onclick="window.print()" style="padding:7px 18px;background:#2e7d32;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;margin-right:8px;">Print Report</button>
-      <button onclick="document.getElementById('summaryModal').remove()" style="padding:7px 18px;background:#c62828;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;">Close</button>
+
+    <!-- TABLE CONTENT (scrollable) -->
+    <div style="overflow:auto;flex:1;padding:12px 14px;" id="smTabContent">
+      <div id="smPane1" class="sm-tab-pane active">${buildTab1()}</div>
+      <div id="smPane2" class="sm-tab-pane">${buildTab2()}</div>
+      <div id="smPane3" class="sm-tab-pane">${buildTab3()}</div>
+      <div id="smPane4" class="sm-tab-pane">${buildTab4()}</div>
+      <div id="smPane5" class="sm-tab-pane">${buildTab5()}</div>
     </div>
+
+    <!-- BOTTOM BUTTONS -->
+    <div style="padding:10px 16px;background:#f0f4f8;border-top:1px solid #ccc;display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;" class="no-print">
+      <button onclick="window.print()" style="padding:8px 22px;background:#2e7d32;color:white;border:none;border-radius:5px;cursor:pointer;font-size:13px;font-weight:700;">🖨️ Print Report</button>
+      <button onclick="document.getElementById('summaryModal').remove()" style="padding:8px 22px;background:#b71c1c;color:white;border:none;border-radius:5px;cursor:pointer;font-size:13px;font-weight:700;">✕ Close</button>
+    </div>
+
   </div>`;
+
   document.body.appendChild(modal);
+
+  // Tab switcher function
+  window.smSwitchTab = function(n){
+    for(let i=1;i<=5;i++){
+      const btn=document.getElementById('smTab'+i);
+      const pane=document.getElementById('smPane'+i);
+      if(btn) btn.classList.toggle('active',i===n);
+      if(pane) pane.classList.toggle('active',i===n);
+    }
+    const content=document.getElementById('smTabContent');
+    if(content) content.scrollTop=0;
+  };
+
   modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
 }
 
@@ -3775,7 +4058,7 @@ function viewRecordHistory(uid){
   },80);
 }
 
-// ─── CLEAR ALL ───
+// ─── CLEAR ALL (DPI only — सभी data) ───
 function clearAllData(){
   if(window.currentUser!=='DPI'){myAlert('⛔ Only DPI can clear all data.');return;}
   if(!confirm('⚠️ CLEAR ALL DATA?\n\nThis will delete all records from Supabase!'))return;
@@ -3783,6 +4066,52 @@ function clearAllData(){
   if(sb)sb.from('ps_gradation').delete().neq('id',0).then(()=>{});
   window.fullData=[];window.filteredData=[];renderVirtual();
   myAlert('✅ All data cleared.');
+}
+
+// ─── CLEAR DIVISION DATA (JD = अपना संभाग, DPI = सभी) ───
+async function clearDivisionData(){
+  const cu=window.currentUser||'';
+  if(cu!=='DPI'&&!cu.startsWith('JD')){myAlert('⛔ Sirf JD aur DPI clear kar sakte hain.');return;}
+
+  if(cu==='DPI'){
+    // DPI: पुरानी clearAllData logic
+    if(!confirm('⚠️ CLEAR ALL DATA?\n\nThis will delete ALL records from Supabase!\n\nक्या आप निश्चित हैं?'))return;
+    const sb=getSupabase();
+    if(sb)await sb.from('ps_gradation').delete().neq('id',0);
+    window.fullData=[];window.filteredData=[];renderVirtual();
+    myAlert('✅ All data cleared.');
+    auditLog&&auditLog('CLEAR_ALL','DPI ne sabhi data clear kiya.');
+    return;
+  }
+
+  // JD: केवल अपने संभाग के जिलों का data
+  const allowedDist=getAllowedDistricts(cu);
+  if(!allowedDist||!allowedDist.length){myAlert('⛔ आपके संभाग की जानकारी नहीं मिली।');return;}
+  const jdInfo=window.DPI_DIVISION_INFO&&window.DPI_DIVISION_INFO[cu];
+  const divLabel=jdInfo?jdInfo.label:cu;
+
+  if(!confirm(`⚠️ ${divLabel} का DATA CLEAR करें?\n\nकेवल आपके संभाग (${allowedDist.join(', ')}) के records Supabase से हटाए जाएंगे।\n\nक्या आप निश्चित हैं?`))return;
+
+  // In-memory se filter karo — allowed districts ke rows निकालो
+  const rowsToDelete=window.fullData.filter(row=>isRowAllowed(row,allowedDist));
+  const idsToDelete=rowsToDelete.map(r=>r._sbId).filter(Boolean);
+
+  const sb=getSupabase();
+  if(sb&&idsToDelete.length){
+    // Supabase se delete (batch of 100)
+    const BATCH=100;
+    for(let s=0;s<idsToDelete.length;s+=BATCH){
+      const chunk=idsToDelete.slice(s,s+BATCH);
+      await sb.from('ps_gradation').delete().in('id',chunk);
+    }
+  }
+
+  // Memory se bhi hatao
+  window.fullData=window.fullData.filter(row=>!isRowAllowed(row,allowedDist));
+  window.filteredData=[...window.fullData];
+  renderVirtual();
+  myAlert(`✅ ${divLabel} के ${rowsToDelete.length} records clear हो गए।`);
+  auditLog&&auditLog('CLEAR_DIVISION',cu+' ne apne sambhag ka data clear kiya: '+rowsToDelete.length+' records.');
 }
 
 // ─── PASTE DATA MODAL ───
@@ -3796,12 +4125,18 @@ function closePasteDataModal(){
   document.getElementById('pasteDataOverlay').style.display='none';
 }
 function processPasteData(){
-  if(window.currentUser!=='DPI'){myAlert('⛔ Only DPI can paste data.');return;}
+  const cu=window.currentUser||'';
+  if(cu!=='DPI'&&!cu.startsWith('JD')){myAlert('⛔ Sirf JD aur DPI paste kar sakte hain.');return;}
   const raw=document.getElementById('pasteDataArea').value.trim();
   if(!raw){myAlert('❌ Koi data nahi mila. Pehle paste karein.');return;}
   const lines=raw.split('\n').filter(l=>l.trim());
   if(!lines.length){myAlert('❌ Data empty hai.');return;}
+
+  // JD के लिए allowed districts
+  const allowedDist=getAllowedDistricts(cu); // null = DPI (सभी allowed), array = JD scope
+
   const newRows=[];
+  const skippedRows=[];
   for(let i=0;i<lines.length;i++){
     const cols=lines[i].split('\t');
     const obj={};
@@ -3816,21 +4151,56 @@ function processPasteData(){
         obj[fk]=p[2]+'-'+p[1]+'-'+p[0];
       }
     });
+
+    // ── JD scope check: field23 = Present Posting District ──
+    if(allowedDist!==null){
+      const rowDist=(obj['field23']||'').trim();
+      const distOk=rowDist&&allowedDist.some(d=>
+        rowDist.toLowerCase()===d.toLowerCase()||
+        rowDist.toLowerCase().includes(d.toLowerCase())||
+        d.toLowerCase().includes(rowDist.toLowerCase())
+      );
+      if(!distOk){
+        skippedRows.push({row:i+1,district:rowDist||'(blank)'});
+        continue; // इस row को skip करो
+      }
+    }
+
     newRows.push(obj);
   }
-  if(!newRows.length){myAlert('❌ Koi valid rows nahi mili.');return;}
-  const confirm=window.confirm(`${newRows.length} rows paste honge. Aage badhein?`);
-  if(!confirm)return;
+
+  if(!newRows.length){
+    const jdInfo=window.DPI_DIVISION_INFO&&window.DPI_DIVISION_INFO[cu];
+    const divLabel=jdInfo?jdInfo.label:cu;
+    myAlert('❌ कोई valid rows नहीं मिलीं।\n\nध्यान दें: आप केवल '+divLabel+' के जिलों ('+
+      (allowedDist?allowedDist.join(', '):'सभी')+') का data paste कर सकते हैं।'+
+      (skippedRows.length?'\n\n⚠️ '+skippedRows.length+' rows skip हुईं (गलत district)':''));
+    return;
+  }
+
+  // Confirm message
+  let confirmMsg=`${newRows.length} rows paste होंगी।`;
+  if(allowedDist!==null){
+    const jdInfo=window.DPI_DIVISION_INFO&&window.DPI_DIVISION_INFO[cu];
+    const divLabel=jdInfo?jdInfo.label:cu;
+    confirmMsg+=`\nसंभाग: ${divLabel}`;
+  }
+  if(skippedRows.length) confirmMsg+=`\n\n⚠️ ${skippedRows.length} rows skip (गलत/blank district)।`;
+  confirmMsg+='\n\nआगे बढ़ें?';
+
+  const conf=window.confirm(confirmMsg);
+  if(!conf)return;
+
   const now=new Date().toLocaleString('en-IN');
   newRows.forEach(row=>{
     row.field29='New Entry';
-    row.field30='Paste by '+currentUser+' | '+now;
+    row.field30='Paste by '+cu+' | '+now;
     row.field31='';
     window.fullData.push(row);
   });
   window.filteredData=[...window.fullData];
   renderVirtual();
-  auditLog('PASTE','Pasted '+newRows.length+' rows by '+currentUser);
+  auditLog('PASTE','Pasted '+newRows.length+' rows by '+cu+(skippedRows.length?' | Skipped: '+skippedRows.length:''));
   // Save to Supabase
   const sb=getSupabase();
   if(sb){
@@ -3840,7 +4210,9 @@ function processPasteData(){
       sb.from('ps_gradation').insert(chunk).select('id').then(({data,error})=>{if(!error&&data)data.forEach((row,idx)=>{newRows[s+idx]._sbId=row.id;});});
     }
   }
-  document.getElementById('pasteDataStatus').textContent='✅ '+newRows.length+' rows successfully added!';
+  let statusMsg='✅ '+newRows.length+' rows successfully added!';
+  if(skippedRows.length) statusMsg+=' ('+skippedRows.length+' rows skip हुईं)';
+  document.getElementById('pasteDataStatus').textContent=statusMsg;
   document.getElementById('pasteDataStatus').style.color='#2e7d32';
   setTimeout(()=>closePasteDataModal(),1800);
 }
@@ -3869,7 +4241,8 @@ document.addEventListener('DOMContentLoaded',function(){
       • Neeche box mein paste karein (Ctrl+V)<br>
       • Columns ka order: <b>S.N. | Unique ID | Name | Category | Gender | DOB | Prof.Qual | UG1 | Sub1 | Sub2 | Sub3 | UG2 | Sub1 | Sub2 | Sub3 | Home Dist | First Appt | Seniority | Transfer | Posting | UDISE | District | Remark | UPP Join | UPP School | UPP UDISE | UPP District</b><br>
       • Dates DD/MM/YYYY ya YYYY-MM-DD dono format accepted hain<br>
-      • <b>Sirf DPI paste kar sakta hai</b>
+      • <b>DPI: सभी संभागों का data paste कर सकते हैं</b><br>
+      • <b>JD: केवल अपने संभाग के जिलों का data paste कर सकते हैं (District field से check होगा)</b>
     </div>
     <textarea id="pasteDataArea" placeholder="Yahan Excel/Sheet se data paste karein (Ctrl+V)..." style="width:100%;height:200px;background:#fff;color:#000;border:1px solid #90caf9;border-radius:4px;padding:8px;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;outline:none;"></textarea>
     <div id="pasteDataStatus" style="min-height:18px;font-size:12px;font-weight:700;margin:8px 0 0;"></div>
