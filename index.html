@@ -27,7 +27,7 @@ function getSupabase(){
   return _supabase;
 }
 function _setLoadUI(p,m,c){const b=document.getElementById('dataLoadBar'),pe=document.getElementById('dataLoadPct'),me=document.getElementById('dataLoadMsg'),ce=document.getElementById('dataLoadCount');if(b)b.style.width=p+'%';if(pe)pe.textContent=Math.round(p)+'%';if(m&&me)me.textContent=m;if(ce&&c!==undefined)ce.textContent=c;}
-async function loadDataFromSupabase(){
+async function _origLoadData(){
   const sb=getSupabase();if(!sb)return false;
   const ov=document.getElementById('dataLoadingOverlay');if(ov)ov.style.display='flex';
   _setLoadUI(5,'Supabase से कनेक्ट हो रहे हैं...','');await new Promise(r=>setTimeout(r,40));
@@ -1388,6 +1388,130 @@ const fieldNames = {
 
 window.fullData=[];window.filteredData=[];
 let historyStore=[],listZoom=11,formZoom=12,selectedRowElement=null,currentUser=null;
+
+// ─── 100 DUMMY RECORDS ───
+(function(){
+  const names=['Ramesh Kumar Sharma','Sunita Devi Patel','Anil Kumar Verma','Priya Singh Chauhan','Vijay Kumar Gupta',
+    'Kavita Rani Tiwari','Suresh Chandra Yadav','Anita Kumari Soni','Rajesh Kumar Mishra','Meena Devi Chouhan',
+    'Dinesh Kumar Joshi','Rekha Bai Pal','Mahesh Prasad Tripathi','Sarla Devi Rawat','Bharat Kumar Dubey',
+    'Nirmala Devi Shukla','Santosh Kumar Pandey','Geeta Rani Dixit','Umesh Kumar Pathak','Sarita Devi Bhatnagar',
+    'Devendra Singh Rathore','Pushpa Devi Nayak','Ashok Kumar Saxena','Usha Rani Bajpai','Narendra Kumar Srivastava',
+    'Kamla Devi Malviya','Pramod Kumar Agarwal','Shobha Devi Jain','Girish Kumar Kesharwani','Asha Devi Kori',
+    'Hemant Kumar Lodhi','Radha Devi Ahirwar','Mukesh Kumar Prajapati','Lata Devi Rajput','Deepak Kumar Vishwakarma',
+    'Savitri Devi Malhotra','Rohit Kumar Dwivedi','Sunita Bai Kushwaha','Rakesh Kumar Arya','Poonam Devi Yadav',
+    'Shiv Kumar Thakur','Mamta Devi Bhatt','Naresh Kumar Kaushik','Rekha Soni Jatav','Vinod Kumar Ahuja',
+    'Kiran Devi Verma','Harish Kumar Nema','Shanti Devi Goswami','Sanjay Kumar Tomar','Ranjana Devi Maravi',
+    'Prem Kumar Bundela','Pushplata Devi Chaturvedi','Subhash Chandra Baghel','Vidya Devi Waskale','Gajendra Singh Dangi',
+    'Mamta Kumari Sahu','Arvind Kumar Bhuriya','Seema Devi Gavit','Lokesh Kumar Uike','Annapurna Devi Mandloi',
+    'Rajendra Prasad Tekam','Chanchal Devi Dhurve','Surendra Kumar Koram','Savita Devi Hirve','Bhupendra Singh Parte',
+    'Laxmi Devi Meshram','Santosh Kumar Bansod','Vandana Devi Nagpure','Dilip Kumar Mankar','Usha Devi Mohod',
+    'Nilesh Kumar Raut','Priyanka Devi Wankhede','Vikas Kumar Bondre','Pallavi Devi Sahare','Kailash Prasad Dhote',
+    'Sunanda Devi Rangari','Ramkumar Singh Koreti','Sangita Devi Kanoje','Ajay Kumar Sohane','Rashmi Devi Chavhan',
+    'Yogesh Kumar Thakre','Anita Devi Chikate','Ganesh Prasad Rathod','Chhaya Devi Gawande','Sunil Kumar Khade',
+    'Nandini Devi Borde','Manoj Kumar Kadam','Swati Devi Jadhav','Santosh Kumar Mane','Anuradha Devi Patil',
+    'Vijaykumar Shinde','Meenakshi Devi Jagtap','Ramesh Babu Kulkarni','Aruna Devi Deshmukh','Suresh Rao Dange',
+    'Laxmibai Devi Pawar','Govind Rao Pingle','Shailaja Devi Sapkal','Dinkar Rao Shelar','Pratibha Devi Gaikwad'];
+
+  const categories=['General','OBC','SC','ST'];
+  const profQuals=['D.Ed','B.Ed','D.El.Ed','M.Ed'];
+  const ugQuals=['B.A.','B.Sc.','B.Com.','B.Tech.'];
+  const sub1=['Hindi','English','Mathematics','Science','Social Science','Sanskrit','Urdu','Political Science','History','Geography','Economics','Commerce'];
+  const sub2=['History','Physics','Accountancy','Computer Science','Biology','Chemistry','Civics','Psychology','Philosophy','Sociology','',''];
+  const sub3=['Geography','Statistics','Business Studies','Electronics','Botany','Zoology','','','','','',''];
+  const districts=['Bhopal','Indore','Jabalpur','Gwalior','Ujjain','Sagar','Rewa','Datia','Morena','Shivpuri',
+    'Vidisha','Raisen','Sehore','Rajgarh','Hoshangabad','Harda','Betul','Narsinghpur','Chhindwara','Seoni',
+    'Balaghat','Mandla','Dindori','Katni','Satna','Sidhi','Singrauli','Chhatarpur','Tikamgarh','Damoh','Panna','Niwari',
+    'Shajapur','Agar Malwa','Dewas','Mandsaur','Neemuch','Ratlam','Indore','Alirajpur','Barwani','Dhar','Jhabua'];
+  const schools=['Govt. HS School, Ward No. 1','Govt. MS School, Nagar Palika','Govt. Primary School, Gram Panchayat',
+    'Govt. Composite School, Tehsil','Govt. HS School, City Area','Govt. Urdu MS School','Govt. Girls HS School',
+    'Govt. Model School','Govt. Excellence School','Ashram School'];
+  const statuses=['New Entry','Updated','New Entry','New Entry','Updated'];
+
+  function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+  function rndInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+  function fmtDate(y,m,d){return String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0')+'/'+y;}
+  function rndDate(y1,y2){return fmtDate(rndInt(y1,y2),rndInt(1,12),rndInt(1,28));}
+  function uid(i){const pfx=['AB','BC','CD','DE','EF','FG','GH','HI','IJ','JK','KL','LM','MN','NO','OP','PQ','QR','RS','ST','TU'];return pfx[i%pfx.length]+String(1000+i).slice(1);}
+
+  const dummy=[];
+  for(let i=0;i<100;i++){
+    const gender=Math.random()<0.55?'M':'F';
+    const dob=rndDate(1975,1995);
+    const appt=rndDate(2005,2018);
+    const sen=rndDate(2005,2018);
+    const dist=rnd(districts);
+    const s1idx=rndInt(0,sub1.length-1);
+    const uq1=rnd(ugQuals);
+    const st=rnd(statuses);
+    const gradNo=2100+i;
+    dummy.push({
+      field1:String(i+1),
+      field2:uid(i),
+      field3:names[i]||('Shikshak '+String(i+1)),
+      field4:rnd(categories),
+      field5:gender,
+      field6:dob,
+      field7:rnd(profQuals),
+      field8:uq1,
+      field9:sub1[s1idx],
+      field10:sub2[s1idx]||'',
+      field11:sub3[s1idx]||'',
+      field12:Math.random()<0.4?rnd(ugQuals.filter(q=>q!==uq1)):'',
+      field13:Math.random()<0.4?rnd(sub1):'',
+      field14:'',field15:'',
+      field16:dist,
+      field17:appt,
+      field18:sen,
+      field19:Math.random()<0.3?rndDate(2015,2023):'',
+      field20:rnd(schools)+', '+dist,
+      field21:String(rndInt(23010000001,23099999999)),
+      field22:dist,
+      field23:dist,
+      field24:Math.random()<0.2?'Transfer on request':'NO',
+      field25:Math.random()<0.1?'YES':'NO',
+      field26:'',field27:'',field28:'',
+      field29:st,
+      field30:st==='Updated'?('Updated by DPI | '+new Date().toLocaleString('en-IN')):'',
+      field31:'',
+      _sbId:null,
+      _changedFields:st==='Updated'?{9:{from:'Hindi',to:sub1[s1idx]}}:undefined,
+      history_log:st==='Updated'?[{time:new Date().toLocaleString('en-IN'),user:'DPI',before:JSON.stringify({field9:'Hindi'}),after:JSON.stringify({field9:sub1[s1idx]})}]:[]
+    });
+  }
+  window._dummyData = dummy;
+})();
+
+// ─── Patch loadDataFromSupabase to inject dummy if Supabase fails/empty ───
+async function loadDataFromSupabase(){
+  const ov=document.getElementById('dataLoadingOverlay');
+  let ok=false;
+  try{
+    const timeout=new Promise(resolve=>setTimeout(()=>resolve(false),6000));
+    ok=await Promise.race([_origLoadData(),timeout]);
+  }catch(e){ok=false;}
+  if(!ok||!window.fullData||window.fullData.length===0){
+    if(ov){ov.style.display='flex';}
+    const msgEl=document.getElementById('dataLoadMsg');
+    if(msgEl)msgEl.textContent='डेमो डेटा लोड हो रहा है...';
+    const barEl=document.getElementById('dataLoadBar');
+    if(barEl)barEl.style.width='80%';
+    const pctEl=document.getElementById('dataLoadPct');
+    if(pctEl)pctEl.textContent='80%';
+    await new Promise(r=>setTimeout(r,500));
+    window.fullData=window._dummyData.map(r=>({...r}));
+    window.fullData.sort((a,b)=>{const na=parseInt(a.field1)||0,nb=parseInt(b.field1)||0;return na-nb;});
+    const allowedDist=getAllowedDistricts(window.currentUser);
+    if(allowedDist!==null)window.fullData=window.fullData.filter(row=>isRowAllowed(row,allowedDist));
+    window.filteredData=[...window.fullData];
+    if(barEl)barEl.style.width='100%';
+    if(pctEl)pctEl.textContent='100%';
+    if(msgEl)msgEl.textContent='✅ डेमो डेटा लोड हुआ!';
+    await new Promise(r=>setTimeout(r,400));
+    if(ov)ov.style.display='none';
+    return true;
+  }
+  return ok;
+}
 
 // ─── CLOCK ───
 function updateClock(){const el=document.getElementById('clockDisplay');if(el)el.textContent=new Date().toLocaleString('en-IN',{hour12:true});}
@@ -3928,8 +4052,8 @@ function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt
 
 function viewHistorySmart(){
   var selRow=document.querySelector('#tableBody tr.selected-row');
-  if(selRow&&selRow.cells[1]){
-    var uid=selRow.cells[1].textContent.trim();
+  if(selRow&&selRow.cells[2]){
+    var uid=selRow.cells[2].textContent.trim();
     if(uid){viewRecordHistory(uid);return;}
   }
   viewHistory();
