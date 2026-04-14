@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -185,7 +186,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
 .pulse-animation{animation:pulse-bell 0.6s ease infinite;}
 
 /* Login */
-#loginOverlay{position:fixed;inset:0;background:linear-gradient(135deg,#002e5b,#0d47a1);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#loginOverlay{position:fixed;inset:0;background:linear-gradient(135deg,#002e5b,#0d47a1);z-index:1000010;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 #lockScreen{display:none;position:fixed;inset:0;background:#f8f9fa;z-index:99999;align-items:center;justify-content:center;}
 #dataLoadingOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99998;align-items:center;justify-content:center;}
 .load-box{background:white;border-radius:12px;padding:32px 40px;text-align:center;min-width:340px;box-shadow:0 10px 40px rgba(0,0,0,.4);}
@@ -1117,6 +1118,50 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
       </div>
     </div>
 
+    <!-- ══ COUNSELLING SUBJECT MAPPING ══ -->
+    <div style="background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.5);border-radius:4px;padding:10px;margin-bottom:12px;">
+      <div style="font-size:10px;color:#ffd54f;font-weight:700;margin-bottom:10px;">🗂️ काउंसलिंग सब्जेक्ट मैपिंग (UG Qualification → Counselling Subject)</div>
+
+      <!-- Current mapping table -->
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;color:#b0bec5;font-weight:700;margin-bottom:5px;">📋 वर्तमान मैपिंग सूची:</div>
+        <div id="asCounsellingMapList" style="max-height:130px;overflow-y:auto;background:rgba(0,0,0,.25);border-radius:3px;padding:6px;font-size:10.5px;">
+          <!-- JS से render होगी -->
+        </div>
+      </div>
+
+      <!-- Add new mapping -->
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:3px;padding:8px;margin-bottom:8px;">
+        <div style="font-size:10px;color:#a5d6a7;font-weight:700;margin-bottom:7px;">➕ नई मैपिंग जोड़ें / अपडेट करें:</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <label style="font-size:10px;font-weight:700;color:#cfd8dc;min-width:110px;">UG QUALIFICATION</label>
+          <input type="text" id="asCMapQual" placeholder="जैसे: B.Sc. In Maths" style="flex:1;padding:4px 7px;font-weight:700;font-size:11px;border:none;border-radius:3px;outline:none;">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:10px;font-weight:700;color:#cfd8dc;min-width:110px;">COUNSELLING SUBJECT</label>
+          <select id="asCMapSubject" style="flex:1;padding:4px 7px;font-weight:700;font-size:11px;border:none;border-radius:3px;outline:none;cursor:pointer;">
+            <option value="">-- सब्जेक्ट चुनें --</option>
+            <option value="Maths">Maths</option>
+            <option value="Science">Science</option>
+            <option value="Social Science">Social Science</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+            <option value="Sanskrit">Sanskrit</option>
+            <option value="Urdu">Urdu</option>
+            <option value="NIL">NIL</option>
+          </select>
+          <button onclick="addCounsellingMapping()" style="background:#1565c0;color:white;border:none;border-radius:3px;padding:5px 11px;font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap;">💾 SAVE</button>
+        </div>
+      </div>
+
+      <!-- Delete mapping -->
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:10px;font-weight:700;color:#ef9a9a;min-width:110px;">मैपिंग हटायें</label>
+        <input type="text" id="asCMapDeleteQual" placeholder="Qualification लिखें और Delete करें" style="flex:1;padding:4px 7px;font-weight:700;font-size:11px;border:none;border-radius:3px;outline:none;">
+        <button onclick="deleteCounsellingMapping()" style="background:#c62828;color:white;border:none;border-radius:3px;padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap;">🗑 DELETE</button>
+      </div>
+    </div>
+
     <!-- Remove section — DPI only -->
     <div id="asRemoveSection" style="display:none;background:rgba(198,40,40,.15);border:1px solid rgba(198,40,40,.4);border-radius:4px;padding:10px;margin-bottom:12px;">
       <div style="font-size:10px;color:#ef9a9a;font-weight:700;margin-bottom:8px;">🗑 SUBJECT REMOVE (DPI ONLY)</div>
@@ -1508,8 +1553,20 @@ function resetToDefault(){
   setTimeout(()=>{closePwChange();renderPwPanel();},800);
 }
 function toggleDPI(){const p=document.getElementById('dpiControlPanel');p.style.display=p.style.display==='none'||!p.style.display?'block':'none';document.getElementById('dpiStartDate').value=window._psStart||'';document.getElementById('dpiEndDate').value=window._psEnd||'';}
-function saveTimeLimit(){const s=document.getElementById('dpiStartDate').value,e=document.getElementById('dpiEndDate').value;if(!s||!e){myAlert('Please select both dates.');return;}window._psStart=s;window._psEnd=e;updateDeadlineBadge();myAlert('✅ Access period updated.');toggleDPI();checkLockStatus();}
-function checkLockStatus(){const s=window._psStart,e=window._psEnd;if(!s||!e)return;const today=new Date().toISOString().split('T')[0];if(today<s||today>e){document.getElementById('lockScreen').style.display='flex';document.getElementById('lockMsg').textContent=`Portal accessible from ${s} to ${e}. Access has ended.`;}else{document.getElementById('lockScreen').style.display='none';}}
+function saveTimeLimit(){const s=document.getElementById('dpiStartDate').value,e=document.getElementById('dpiEndDate').value;if(!s||!e){myAlert('Please select both dates.');return;}window._psStart=s;window._psEnd=e;localStorage.setItem('ps_config_start',s);localStorage.setItem('ps_config_end',e);updateDeadlineBadge();myAlert('✅ Access period updated.');toggleDPI();checkLockStatus();}
+function checkLockStatus(){
+  // ✅ RULE 1: DPI hamesha exempt — kabhi lock nahi hoga
+  const cu=window.currentUser||currentUser||null;
+  if(cu==='DPI'){document.getElementById('lockScreen').style.display='none';return;}
+  // ✅ RULE 2: Koi logged in nahi hai to lockScreen mat dikhao
+  if(!cu){document.getElementById('lockScreen').style.display='none';return;}
+  // ✅ RULE 3: Sirf JD aur DEO ke liye date check karo
+  const s=window._psStart,e=window._psEnd;
+  if(!s||!e)return;
+  const today=new Date().toISOString().split('T')[0];
+  if(today<s||today>e){document.getElementById('lockScreen').style.display='flex';document.getElementById('lockMsg').textContent=`Portal accessible from ${s} to ${e}. Access has ended.`;}
+  else{document.getElementById('lockScreen').style.display='none';}
+}
 function updateDeadlineBadge(){const e=window._psEnd,badge=document.getElementById('deadlineBadge'),bt=document.getElementById('deadlineBadgeText');if(!badge||!bt||!e)return;const p=e.split('-');bt.textContent='कार्य करने की अंतिम तिथि: '+(p.length===3?p[2]+'-'+p[1]+'-'+p[0]:e);const diff=Math.round((new Date(e)-new Date())/86400000);if(diff<0){badge.style.background='#fee2e2';badge.style.color='#991b1b';}else if(diff<=7){badge.style.background='#fff3cd';badge.style.color='#856404';}else{badge.style.background='#dcfce7';badge.style.color='#166534';}}
 
 // ─── LOGIN ───
@@ -1541,6 +1598,8 @@ function checkLogin(){
     // Rebuild table head to show/hide office-only columns based on role
     buildTableHead();buildFilterRow();
     auditLog('LOGIN','User logged in');
+    // ✅ Date lock check: DPI ke liye bypass, JD/DEO ke liye apply
+    if(typeof checkLockStatus==='function') checkLockStatus();
     // Show online status bar immediately with self badge — no Supabase wait
     const _osb = document.getElementById('onlineStatusBar');
     if(_osb) _osb.style.display = 'flex';
@@ -1881,6 +1940,11 @@ async function saveAndSync(record){const ok=await saveRecordToSupabase(record);u
 
 // ─── INIT ───
 window.onload=function(){
+  // ✅ localStorage se dates load karo (page refresh ke baad bhi dates rahein)
+  const _savedStart=localStorage.getItem('ps_config_start');
+  const _savedEnd=localStorage.getItem('ps_config_end');
+  if(_savedStart) window._psStart=_savedStart;
+  if(_savedEnd)   window._psEnd=_savedEnd;
   buildTableHead();buildFilterRow();fillDistrictDropdowns();
   // Set max=today on all date inputs to block future dates
   const today=new Date().toISOString().split('T')[0];
@@ -2526,6 +2590,7 @@ function openAddSubjectModal(ugNum) {
   }
 
   document.getElementById('addSubjectModal').style.display = 'flex';
+  renderCounsellingMapList();
   setTimeout(() => document.getElementById('asSubSingle').focus(), 100);
 }
 
@@ -2534,6 +2599,56 @@ function closeAddSubjectModal() {
 }
 
 function updateAddSubjectOptions() {}  // no-op now
+
+// ─── COUNSELLING MAP UI FUNCTIONS ───
+
+function renderCounsellingMapList() {
+  const el = document.getElementById('asCounsellingMapList');
+  if (!el) return;
+  const entries = Object.entries(ugToCounsellingMap);
+  if (entries.length === 0) { el.innerHTML = '<span style="color:#aaa;font-size:10px;">कोई मैपिंग नहीं है।</span>'; return; }
+  el.innerHTML = entries.map(([qual, subj]) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 5px;border-bottom:1px solid rgba(255,255,255,.08);">
+       <span style="color:#fff;font-weight:600;">${qual}</span>
+       <span style="color:#81d4fa;margin:0 8px;">→</span>
+       <span style="color:#a5d6a7;font-weight:700;flex:1;text-align:right;">${subj || '(blank)'}</span>
+     </div>`
+  ).join('');
+}
+
+function addCounsellingMapping() {
+  const qual  = document.getElementById('asCMapQual').value.trim();
+  const subj  = document.getElementById('asCMapSubject').value;
+  if (!qual) { myAlert('❌ UG Qualification लिखें!'); return; }
+  if (!subj) { myAlert('❌ Counselling Subject चुनें!'); return; }
+
+  // Update both maps
+  ugToCounsellingMap[qual]    = subj;
+  ugToCounsellingSubject[qual] = subj;
+
+  // Reset inputs
+  document.getElementById('asCMapQual').value    = '';
+  document.getElementById('asCMapSubject').value = '';
+
+  renderCounsellingMapList();
+  showNotification(`✅ मैपिंग सेव हुई: ${qual} → ${subj}`, 'update');
+  // Recompute counselling subjects in open form
+  if (typeof computeCounsellingSubjects === 'function') computeCounsellingSubjects();
+}
+
+function deleteCounsellingMapping() {
+  const qual = document.getElementById('asCMapDeleteQual').value.trim();
+  if (!qual) { myAlert('❌ हटाने के लिए Qualification लिखें!'); return; }
+  if (ugToCounsellingMap[qual] === undefined) { myAlert(`❌ "${qual}" की मैपिंग नहीं मिली!`); return; }
+
+  delete ugToCounsellingMap[qual];
+  delete ugToCounsellingSubject[qual];
+
+  document.getElementById('asCMapDeleteQual').value = '';
+  renderCounsellingMapList();
+  showNotification(`🗑️ मैपिंग हटाई: ${qual}`, 'delete');
+  if (typeof computeCounsellingSubjects === 'function') computeCounsellingSubjects();
+}
 
 function applyAddSubject() {
   const qual = document.getElementById('asQual').value.trim();
