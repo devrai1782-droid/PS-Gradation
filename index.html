@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -399,6 +401,94 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
   </div>
 </div>
 
+<!-- ═══ PASSWORD PANEL MODAL ═══ -->
+<style>
+#pwPanelOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99995;align-items:center;justify-content:center;}
+#pwPanelBox{background:#fff;border-radius:14px;width:96%;max-width:700px;max-height:92vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6);display:flex;flex-direction:column;}
+.pwp-hdr{background:linear-gradient(135deg,#4a148c,#7b1fa2);color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.pwp-tab{flex:1;padding:9px 4px;border:none;font-weight:700;font-size:11.5px;cursor:pointer;border-radius:0;transition:.15s;}
+.pwp-tab.active{background:#4a148c;color:white;}
+.pwp-tab:not(.active){background:#f3e5f5;color:#4a148c;}
+#pwPanelTable table{width:100%;border-collapse:collapse;font-size:12px;}
+#pwPanelTable th{background:#4a148c;color:white;padding:8px 8px;text-align:left;position:sticky;top:0;z-index:2;white-space:nowrap;}
+#pwPanelTable td{padding:6px 8px;border-bottom:1px solid #f0e6ff;vertical-align:middle;}
+#pwPanelTable tr:nth-child(even) td{background:#fdf5ff;}
+#pwPanelTable tr:hover td{background:#ede7f6!important;}
+/* Change PW mini modal */
+#pwChangeBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;align-items:center;justify-content:center;}
+</style>
+<div id="pwPanelOverlay">
+  <div id="pwPanelBox">
+    <div class="pwp-hdr">
+      <div>
+        <div style="font-size:16px;font-weight:800;">🔑 Password Panel — DPI Admin</div>
+        <div style="font-size:10px;opacity:0.8;margin-top:2px;">सभी जिला / JD / DPI के Passwords देखें व बदलें</div>
+      </div>
+      <button onclick="closePwPanel()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:30px;height:30px;border-radius:50%;font-size:18px;cursor:pointer;font-weight:bold;line-height:1;">×</button>
+    </div>
+    <!-- Auth Section -->
+    <div id="pwPanelAuth" style="padding:28px;text-align:center;flex:1;">
+      <div style="font-size:36px;margin-bottom:8px;">🔐</div>
+      <div style="font-size:14px;font-weight:700;color:#4a148c;margin-bottom:5px;">DPI Admin Verification</div>
+      <div style="font-size:11px;color:#666;margin-bottom:16px;">Password Panel देखने के लिए DPI का Password डालें</div>
+      <input type="password" id="pwPanelAuthInput" placeholder="DPI Password डालें" maxlength="10"
+        style="width:200px;padding:10px;border:2px solid #7b1fa2;border-radius:7px;font-size:15px;text-align:center;outline:none;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;"
+        onkeydown="if(event.key==='Enter')verifyPwPanel()">
+      <div id="pwPanelAuthErr" style="color:red;font-size:11px;min-height:14px;font-weight:bold;margin-bottom:10px;"></div>
+      <button onclick="verifyPwPanel()" style="padding:9px 28px;background:#4a148c;color:white;border:none;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;">✅ Verify करें</button>
+    </div>
+    <!-- Content -->
+    <div id="pwPanelContent" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+      <!-- Search + tools bar -->
+      <div style="padding:10px 14px;background:#f8f0ff;border-bottom:1px solid #e1bee7;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0;">
+        <input type="text" id="pwPanelSearch" placeholder="🔍 जिला / JD खोजें..." oninput="filterPwPanel()"
+          style="flex:1;min-width:140px;padding:7px 10px;border:1.5px solid #ce93d8;border-radius:5px;font-size:12px;outline:none;">
+        <span style="font-size:11px;color:#6a1b9a;font-weight:600;white-space:nowrap;" id="pwPanelCount"></span>
+        <button onclick="copyAllPasswords()" style="padding:6px 12px;background:#4a148c;color:white;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">📋 सभी Copy</button>
+      </div>
+      <!-- Tabs -->
+      <div style="display:flex;border-bottom:2px solid #e1bee7;flex-shrink:0;">
+        <button class="pwp-tab active" id="tabJd"   onclick="setPwTab('jd')">📍 JD Office (9)</button>
+        <button class="pwp-tab"        id="tabDist" onclick="setPwTab('dist')">🏛️ जिला DEO (52)</button>
+        <button class="pwp-tab"        id="tabDpi"  onclick="setPwTab('dpi')">🛡️ DPI</button>
+        <button class="pwp-tab"        id="tabAll"  onclick="setPwTab('all')">🌐 सभी</button>
+      </div>
+      <!-- Table scroll area -->
+      <div id="pwPanelTable" style="overflow-y:auto;flex:1;padding:0;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHANGE PASSWORD MINI MODAL ═══ -->
+<div id="pwChangeBox">
+  <div style="background:white;border-radius:12px;width:92%;max-width:380px;box-shadow:0 16px 50px rgba(0,0,0,0.5);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#1a237e,#283593);color:white;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-weight:800;font-size:14px;">🔒 Password बदलें</div>
+      <button onclick="closePwChange()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:26px;height:26px;border-radius:50%;font-size:15px;cursor:pointer;">×</button>
+    </div>
+    <div style="padding:20px;">
+      <div id="pwChangeLabel" style="font-size:12px;font-weight:700;color:#1a237e;margin-bottom:14px;padding:7px 10px;background:#e8eaf6;border-radius:5px;text-align:center;"></div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px;">नया Password</label>
+        <input type="text" id="pwChangeNew" placeholder="नया password टाइप करें" maxlength="20"
+          style="width:100%;padding:9px 11px;border:1.5px solid #9fa8da;border-radius:5px;font-size:13px;font-weight:700;outline:none;box-sizing:border-box;"
+          oninput="pwChangePreview()">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px;">Confirm Password</label>
+        <input type="text" id="pwChangeConfirm" placeholder="दोबारा टाइप करें" maxlength="20"
+          style="width:100%;padding:9px 11px;border:1.5px solid #9fa8da;border-radius:5px;font-size:13px;font-weight:700;outline:none;box-sizing:border-box;"
+          onkeydown="if(event.key==='Enter')savePwChange()">
+      </div>
+      <div id="pwChangeMsg" style="font-size:11px;min-height:14px;font-weight:bold;margin-bottom:12px;text-align:center;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="savePwChange()" style="flex:1;padding:9px;background:#1a237e;color:white;border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">✅ Save करें</button>
+        <button onclick="resetToDefault()" style="flex:1;padding:9px;background:#bf360c;color:white;border:none;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">↺ Default Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CUSTOM ALERT -->
 <div id="customAlert">
   <div class="alert-box"><p id="alertMsg"></p><button onclick="closeAlert()" style="padding:8px 24px;background:#002e5b;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:700;">OK</button></div>
@@ -431,6 +521,32 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
   <button onclick="saveTimeLimit()" style="width:100%;background:#002e5b;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:600;">Update Access Limit</button>
 </div>
 
+
+<!-- ═══ DPI DIVISION SELECTOR MODAL ═══ -->
+<style>
+.div-card{cursor:pointer;border:2px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 12px;background:rgba(255,255,255,0.05);transition:all .2s;text-align:left;}
+.div-card:hover{filter:brightness(1.3);}
+.div-card.active{border-width:2px;box-shadow:0 0 12px rgba(255,255,255,0.2);}
+</style>
+<div id="dpiDivisionModal" style="display:none;position:fixed;inset:0;background:rgba(0,10,30,0.93);z-index:99997;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:linear-gradient(145deg,#001a3a,#002e5b);border:2px solid rgba(44,123,229,0.5);border-radius:16px;width:92%;max-width:680px;padding:28px 24px;box-shadow:0 24px 80px rgba(0,0,0,0.7);">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="font-size:32px;">🗺️</div>
+      <div style="font-size:18px;font-weight:800;color:#fff;margin-top:6px;">संभाग चुनें</div>
+      <div style="font-size:12px;color:#90caf9;margin-top:4px;">DPI Admin — कौन सा संभाग का डेटा देखना है?</div>
+    </div>
+    <div id="divisionGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;"></div>
+    <div class="div-card" onclick="dpiSelectDivision('ALL')" style="border-color:rgba(255,193,7,0.5);background:rgba(255,193,7,0.08);display:flex;align-items:center;gap:14px;">
+      <span style="font-size:24px;">🌐</span>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#ffc107;">सभी 9 संभाग — सम्पूर्ण मध्यप्रदेश</div>
+        <div style="font-size:10px;color:#ffecb3;margin-top:2px;">~1,25,000 रिकॉर्ड · लोड होने में समय लगेगा</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.35);text-align:center;margin-top:12px;">⚡ एक संभाग चुनने से डेटा तेज़ लोड होगा</div>
+  </div>
+</div>
+
 <!-- LOCK SCREEN -->
 <div id="lockScreen" style="display:none;position:fixed;inset:0;background:#f8f9fa;z-index:99999;align-items:center;justify-content:center;">
   <div style="text-align:center;max-width:500px;padding:40px;background:white;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.08);">
@@ -446,6 +562,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
   <div class="toolbar">
     <span id="userBadge" style="background:#002e5b;color:white;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;display:none;"></span>
     <button class="btn btn-blue" onclick="toggleForm(true)" style="animation:blinkBtn 1.1s ease-in-out infinite;cursor:pointer;">📝 SHOW FORM</button>
+    <button id="changeDivisionBtn" onclick="showDpiDivisionSelector(true)" style="display:none;padding:7px 14px;font-size:12px;border-radius:4px;cursor:pointer;border:none;background:linear-gradient(135deg,#e65100,#ff6d00);color:white;font-weight:700;">🗺️ <span id="currentDivLabel">संभाग बदलें</span></button>
     <button class="btn" style="background:#ff9800;color:white;" onclick="exportPDF()">🖨 PRINT PDF</button>
     <button class="btn" style="background:#17a2b8;color:white;" onclick="showSummary()">📊 SUMMARY</button>
     <button class="btn" style="background:#009688;color:white;" onclick="viewHistorySmart()">📋 HISTORY</button>
@@ -460,6 +577,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
         <button class="otb-item" onclick="const cu=window.currentUser||'';if(cu!=='DPI'&&!cu.startsWith('JD')){alert('⛔ Sirf JD aur DPI paste kar sakte hain.');return;}const pw=prompt('🔐 Password darj karein:');if(pw!=='1782'){alert('❌ Galat password!');return;}openPasteDataModal();closeOtherToolbar();" style="color:#0d47a1;font-weight:700;">📋 PASTE DATA</button>
         <div style="padding:4px 14px 6px;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;margin:6px 0 4px;">DATA MANAGEMENT</div>
         <button class="otb-item" onclick="const cu=window.currentUser||'';if(cu!=='DPI'&&!cu.startsWith('JD')){alert('⛔ Sirf JD aur DPI clear kar sakte hain.');return;}const pw=prompt('🔐 Password darj karein:');if(pw!=='1782'){alert('❌ Galat password!');return;}clearAllData();closeOtherToolbar();" style="color:#c62828;">🗑 CLEAR ALL DATA</button>
+        <button id="pwPanelBtn" class="otb-item" onclick="openPwPanel();closeOtherToolbar();" style="display:none;color:#4a148c;font-weight:700;">🔑 PASSWORD PANEL</button>
         <button class="otb-item" onclick="openPwResetLog();closeOtherToolbar();" style="color:#6a1b9a;">🔐 PASSWORD RESET LOG</button>
         <div style="padding:4px 14px 6px;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;margin:6px 0 4px;">ZOOM</div>
         <div style="padding:4px 14px 8px;display:flex;align-items:center;gap:6px;">
@@ -650,7 +768,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
           <option>Geography</option><option>Hindi Literature</option><option>History</option>
           <option>Home Science</option><option>Maths</option><option>Physics</option>
           <option>Political Science</option><option>Psychology</option><option>Sanskrit Literature</option>
-          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option><option>NIL</option>
+          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option>
         </select>
         <button class="dpi-clear-btn" onclick="clearField('in9')" title="Clear Subject-1">✕</button>
       </div>
@@ -664,7 +782,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
           <option>Geography</option><option>Hindi Literature</option><option>History</option>
           <option>Home Science</option><option>Maths</option><option>Physics</option>
           <option>Political Science</option><option>Psychology</option><option>Sanskrit Literature</option>
-          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option><option>NIL</option>
+          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option>
         </select>
         <button class="dpi-clear-btn" onclick="clearField('in10')" title="Clear Subject-2">✕</button>
       </div>
@@ -678,7 +796,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
           <option>Geography</option><option>Hindi Literature</option><option>History</option>
           <option>Home Science</option><option>Maths</option><option>Physics</option>
           <option>Political Science</option><option>Psychology</option><option>Sanskrit Literature</option>
-          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option><option>NIL</option>
+          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option>
         </select>
         <button class="dpi-clear-btn" onclick="clearField('in11')" title="Clear Subject-3">✕</button>
       </div>
@@ -738,7 +856,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
           <option>Geography</option><option>Hindi Literature</option><option>History</option>
           <option>Home Science</option><option>Maths</option><option>Physics</option>
           <option>Political Science</option><option>Psychology</option><option>Sanskrit Literature</option>
-          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option><option>NIL</option>
+          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option>
         </select>
         <button class="dpi-clear-btn" onclick="clearField('in13')" title="Clear Subject-1">✕</button>
       </div>
@@ -752,7 +870,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
           <option>Geography</option><option>Hindi Literature</option><option>History</option>
           <option>Home Science</option><option>Maths</option><option>Physics</option>
           <option>Political Science</option><option>Psychology</option><option>Sanskrit Literature</option>
-          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option><option>NIL</option>
+          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option>
         </select>
         <button class="dpi-clear-btn" onclick="clearField('in14')" title="Clear Subject-2">✕</button>
       </div>
@@ -766,7 +884,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
           <option>Geography</option><option>Hindi Literature</option><option>History</option>
           <option>Home Science</option><option>Maths</option><option>Physics</option>
           <option>Political Science</option><option>Psychology</option><option>Sanskrit Literature</option>
-          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option><option>NIL</option>
+          <option>Sociology</option><option>Urdu Literature</option><option>Zoology</option>
         </select>
         <button class="dpi-clear-btn" onclick="clearField('in15')" title="Clear Subject-3">✕</button>
       </div>
@@ -845,7 +963,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
       <div class="row-item">
         <div class="f-num">17</div>
         <div class="f-label">DATE OF FIRST APPOINTMENT</div>
-        <input type="date" id="in17" class="f-input" min="1994-01-01" onchange="validateDates();var v17=this.value;if(v17){document.getElementById('in18').value=v17;}else{document.getElementById('in18').value='';}" onkeydown="return false;" onpaste="return false;" style="cursor:pointer;">
+        <input type="date" id="in17" class="f-input" min="1998-01-01" onchange="validateDates();var v17=this.value;if(v17){document.getElementById('in18').value=v17;}else{document.getElementById('in18').value='';}" onkeydown="return false;" onpaste="return false;" style="cursor:pointer;">
       </div>
 
       <div class="row-item">
@@ -861,7 +979,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
           <select id="in19mode" style="width:55px;font-size:11px;border:none;border-right:1px solid #ccc;padding:2px;" onchange="handleTransferMode()">
             <option value="DATE">DATE</option><option value="NIL">NIL</option>
           </select>
-          <input type="date" id="in19" class="f-input" style="flex:1;width:auto;cursor:pointer;" onchange="validateDates();" onkeydown="return false;" onpaste="return false;">
+          <input type="date" id="in19" class="f-input" min="1998-01-01" style="flex:1;width:auto;cursor:pointer;" onchange="validateDates();" onkeydown="return false;" onpaste="return false;">
         </div>
       </div>
 
@@ -1147,11 +1265,17 @@ const JD_DISTRICTS = {
 // ─── Get allowed districts for current user ───
 function getAllowedDistricts(user){
   if(!user)return null;
-  if(user==='DPI')return null; // null = poora MP ka data
-  if(JD_DISTRICTS[user])return JD_DISTRICTS[user]; // JD user
-  const deoDist=DEO_DISTRICT[user];
-  if(deoDist)return[deoDist]; // DEO user - sirf apna ek district
-  return[]; // unknown = koi data nahi
+  if(user==='DPI'){
+    var sel=window.dpiSelectedDivision;
+    if(!sel||sel==='ALL')return null;
+    var info=window.DPI_DIVISION_INFO&&window.DPI_DIVISION_INFO[sel];
+    if(info)return info.districts;
+    return null;
+  }
+  if(JD_DISTRICTS[user])return JD_DISTRICTS[user];
+  var deoDist=DEO_DISTRICT[user];
+  if(deoDist)return[deoDist];
+  return[];
 }
 
 // ─── Check if a row belongs to current user's scope ───
@@ -1168,35 +1292,35 @@ function isRowAllowed(row, allowedDistricts){
 
 // ─── 28 COLUMN CONFIG ───
 const colConfig = [
-  {name:"S.N.",cls:"col-xs"},{name:"Unique ID",cls:"col-sm"},{name:"Name",cls:"col-lg"},
-  {name:"Category",cls:"col-sm"},{name:"Gender",cls:"col-sm"},{name:"Date of Birth",cls:"col-md"},
-  {name:"Prof. Qual.",cls:"col-md"},{name:"UG Qual-1",cls:"col-sm"},
-  {name:"UG1 Sub-1",cls:"col-md"},{name:"UG1 Sub-2",cls:"col-md"},{name:"UG1 Sub-3",cls:"col-md"},
-  {name:"UG Qual-2",cls:"col-sm"},{name:"UG2 Sub-1",cls:"col-md"},{name:"UG2 Sub-2",cls:"col-md"},{name:"UG2 Sub-3",cls:"col-md"},
-  {name:"Home District",cls:"col-md"},{name:"First Appt.",cls:"col-md"},
-  {name:"Seniority Date",cls:"col-md"},{name:"Transfer Date",cls:"col-md"},
-  {name:"Present Posting Place",cls:"col-xl"},{name:"UDISE Code",cls:"col-md"},
-  {name:"Present District",cls:"col-lg"},
-  {name:"Remark",cls:"col-lg"},
-  {name:"उच्च पद ज्वाइन",cls:"col-md"},{name:"उच्च पद शाला",cls:"col-xl"},
-  {name:"उच्च पद UDISE",cls:"col-md"},{name:"उच्च पद जिला",cls:"col-lg"},
-  {name:"Status",cls:"col-md"},           // field29
-  {name:"Updated By",cls:"col-lg"},       // field30
-  {name:"View Document",cls:"col-md"},    // field31
+  {name:"S.N.",cls:"col-xs",fi:1},{name:"Unique ID",cls:"col-sm",fi:2},{name:"Name",cls:"col-lg",fi:3},
+  {name:"Category",cls:"col-sm",fi:4},{name:"Gender",cls:"col-sm",fi:5},{name:"Date of Birth",cls:"col-md",fi:6},
+  {name:"Prof. Qual.",cls:"col-md",fi:7},{name:"UG Qual-1",cls:"col-sm",fi:8},
+  {name:"UG1 Sub-1",cls:"col-md",fi:9},{name:"UG1 Sub-2",cls:"col-md",fi:10},{name:"UG1 Sub-3",cls:"col-md",fi:11},
+  {name:"UG Qual-2",cls:"col-sm",fi:12},{name:"UG2 Sub-1",cls:"col-md",fi:13},{name:"UG2 Sub-2",cls:"col-md",fi:14},{name:"UG2 Sub-3",cls:"col-md",fi:15},
+  {name:"Home District",cls:"col-md",fi:16},{name:"First Appt.",cls:"col-md",fi:17},
+  {name:"Seniority Date",cls:"col-md",fi:18},{name:"Transfer Date",cls:"col-md",fi:19},
+  {name:"Present Posting Place",cls:"col-xl",fi:20},{name:"UDISE Code",cls:"col-md",fi:21},
+  {name:"Present District",cls:"col-lg",fi:23},
+  {name:"Remark",cls:"col-lg",fi:24},
+  {name:"उच्च पद ज्वाइन",cls:"col-md",fi:25},{name:"उच्च पद शाला",cls:"col-xl",fi:26},
+  {name:"उच्च पद UDISE",cls:"col-md",fi:27},{name:"उच्च पद जिला",cls:"col-lg",fi:28},
+  {name:"Status",cls:"col-md",fi:29},           // field29
+  {name:"Updated By",cls:"col-lg",fi:30},       // field30
+  {name:"View Document",cls:"col-md",fi:31},    // field31
   // ── OFFICE USE ONLY — JD/DPI ──
-  {name:"काउं. विषय UG-1 (C1)",cls:"col-md", officeOnly:true},
-  {name:"काउं. विषय UG-1 (C2)",cls:"col-md", officeOnly:true},
-  {name:"काउं. विषय UG-1 (C3)",cls:"col-md", officeOnly:true},
-  {name:"काउं. विषय UG-1 (C4)",cls:"col-md", officeOnly:true},
-  {name:"काउं. विषय UG-2 (D1)",cls:"col-md", officeOnly:true},
-  {name:"काउं. विषय UG-2 (D2)",cls:"col-md", officeOnly:true},
-  {name:"काउं. विषय UG-2 (D3)",cls:"col-md", officeOnly:true},
-  {name:"काउं. विषय UG-2 (D4)",cls:"col-md", officeOnly:true},
+  {name:"काउं. विषय UG-1 (C1)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:32},
+  {name:"काउं. विषय UG-1 (C2)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:33},
+  {name:"काउं. विषय UG-1 (C3)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:34},
+  {name:"काउं. विषय UG-1 (C4)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:35},
+  {name:"काउं. विषय UG-2 (D1)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:36},
+  {name:"काउं. विषय UG-2 (D2)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:37},
+  {name:"काउं. विषय UG-2 (D3)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:38},
+  {name:"काउं. विषय UG-2 (D4)",cls:"col-md", officeOnly:true, dpiOnly:true, fi:39},
   // ── FINAL COUNSELLING SUBJECTS — JD/DPI only ──
-  {name:"फाइनल काउं. विषय-1",cls:"col-md", officeOnly:true, finalCS:true},
-  {name:"फाइनल काउं. विषय-2",cls:"col-md", officeOnly:true, finalCS:true},
-  {name:"फाइनल काउं. विषय-3",cls:"col-md", officeOnly:true, finalCS:true},
-  {name:"फाइनल काउं. विषय-4",cls:"col-md", officeOnly:true, finalCS:true},
+  {name:"फाइनल काउं. विषय-1",cls:"col-md", officeOnly:true, finalCS:true, fi:40},
+  {name:"फाइनल काउं. विषय-2",cls:"col-md", officeOnly:true, finalCS:true, fi:41},
+  {name:"फाइनल काउं. विषय-3",cls:"col-md", officeOnly:true, finalCS:true, fi:42},
+  {name:"फाइनल काउं. विषय-4",cls:"col-md", officeOnly:true, finalCS:true, fi:43},
 ];
 
 const fieldNames = {
@@ -1232,6 +1356,157 @@ window.alert=function(m){myAlert(m);};
 // ─── DPI ───
 function openDpiPasswordModal(){document.getElementById('dpiPassModal').style.display='flex';document.getElementById('dpiPassInput').value='';document.getElementById('dpiPassErr').textContent='';setTimeout(()=>document.getElementById('dpiPassInput').focus(),100);}
 function verifyDpiPass(){if(document.getElementById('dpiPassInput').value!=='1782'){document.getElementById('dpiPassErr').textContent='❌ Galat password!';document.getElementById('dpiPassInput').value='';return;}document.getElementById('dpiPassModal').style.display='none';toggleDPI();}
+
+// ─── PASSWORD PANEL ───
+let _pwPanelTab = 'jd';
+let _pwChangeTarget = null;
+
+function openPwPanel(){
+  const ov=document.getElementById('pwPanelOverlay');
+  ov.style.display='flex';
+  document.getElementById('pwPanelAuth').style.display='block';
+  document.getElementById('pwPanelContent').style.display='none';
+  document.getElementById('pwPanelAuthInput').value='';
+  document.getElementById('pwPanelAuthErr').textContent='';
+  setTimeout(()=>document.getElementById('pwPanelAuthInput').focus(),100);
+}
+function closePwPanel(){
+  document.getElementById('pwPanelOverlay').style.display='none';
+}
+function verifyPwPanel(){
+  const val=document.getElementById('pwPanelAuthInput').value.trim();
+  const dpiPass=getEffectivePassword('DPI')||'1782';
+  if(val!==dpiPass){document.getElementById('pwPanelAuthErr').textContent='❌ गलत Password!';document.getElementById('pwPanelAuthInput').value='';setTimeout(()=>document.getElementById('pwPanelAuthInput').focus(),50);return;}
+  document.getElementById('pwPanelAuth').style.display='none';
+  const c=document.getElementById('pwPanelContent');
+  c.style.display='flex';c.style.flexDirection='column';
+  _pwPanelTab='jd';
+  setPwTab('jd');
+}
+function setPwTab(tab){
+  _pwPanelTab=tab;
+  ['jd','dist','dpi','all'].forEach(t=>{
+    const btn=document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn){btn.classList.toggle('active',t===tab);}
+  });
+  document.getElementById('pwPanelSearch').value='';
+  renderPwPanel();
+}
+function _getPwEntries(){
+  const custom=window._customPasswords||{};
+  const jdEntries=[
+    {id:'JDBHOPAL',label:'JD Bhopal',type:'JD',sub:'भोपाल संभाग'},
+    {id:'JDGWALIOR',label:'JD Gwalior',type:'JD',sub:'ग्वालियर संभाग'},
+    {id:'JDINDORE',label:'JD Indore',type:'JD',sub:'इंदौर संभाग'},
+    {id:'JDJABALPUR',label:'JD Jabalpur',type:'JD',sub:'जबलपुर संभाग'},
+    {id:'JDUJJAIN',label:'JD Ujjain',type:'JD',sub:'उज्जैन संभाग'},
+    {id:'JDSAGAR',label:'JD Sagar',type:'JD',sub:'सागर संभाग'},
+    {id:'JDREWA',label:'JD Rewa',type:'JD',sub:'रीवा संभाग'},
+    {id:'JDNARMADAPURAM',label:'JD Narmadapuram',type:'JD',sub:'नर्मदापुरम संभाग'},
+    {id:'JDSHAHDOL',label:'JD Shahdol',type:'JD',sub:'शहडोल संभाग'},
+  ];
+  const deoEntries=Object.entries(DEO_DISTRICT).map(([id,dist])=>({id,label:'DEO '+dist,type:'DEO',sub:dist+' जिला'}));
+  deoEntries.sort((a,b)=>a.label.localeCompare(b.label));
+  const dpiEntry=[{id:'DPI',label:'DPI Admin',type:'DPI',sub:'Directorate of Public Instruction'}];
+  const merge=(arr)=>arr.map(e=>({...e,pass:custom[e.id]||districtCredentials[e.id]||'-',changed:!!(custom[e.id]),defaultPass:districtCredentials[e.id]||'-'}));
+  return {jd:merge(jdEntries),deo:merge(deoEntries),dpi:merge(dpiEntry)};
+}
+function renderPwPanel(){
+  const search=(document.getElementById('pwPanelSearch').value||'').toLowerCase();
+  const {jd,deo,dpi}=_getPwEntries();
+  let rows=[];
+  if(_pwPanelTab==='jd') rows=jd;
+  else if(_pwPanelTab==='dist') rows=deo;
+  else if(_pwPanelTab==='dpi') rows=dpi;
+  else rows=[...dpi,...jd,...deo];
+  if(search) rows=rows.filter(r=>r.label.toLowerCase().includes(search)||r.id.toLowerCase().includes(search)||(r.sub||'').toLowerCase().includes(search));
+  document.getElementById('pwPanelCount').textContent='कुल: '+rows.length;
+  const wrap=document.getElementById('pwPanelTable');
+  if(!rows.length){wrap.innerHTML='<div style="text-align:center;padding:30px;color:#999;">कोई रिकॉर्ड नहीं मिला।</div>';return;}
+  const typeColor={JD:'#1b5e20',DEO:'#bf360c',DPI:'#1a237e'};
+  let html='<table><thead><tr>'
+    +'<th style="width:36px;">क्र.</th>'
+    +'<th style="width:150px;">User ID</th>'
+    +'<th>नाम / विवरण</th>'
+    +'<th style="width:46px;">Type</th>'
+    +'<th style="width:90px;text-align:center;">Password</th>'
+    +'<th style="width:42px;text-align:center;">Copy</th>'
+    +'<th style="width:52px;text-align:center;">बदलें</th>'
+    +'</tr></thead><tbody>';
+  rows.forEach((r,i)=>{
+    const badge=r.changed?'<span style="font-size:8px;background:#e65100;color:white;padding:1px 4px;border-radius:2px;margin-left:4px;vertical-align:middle;">बदला</span>':'';
+    html+=`<tr>
+      <td style="color:#aaa;text-align:center;">${i+1}</td>
+      <td style="font-weight:700;color:#4a148c;font-family:monospace;font-size:11px;">${r.id}</td>
+      <td style="font-size:11px;"><b>${r.label}</b><br><span style="color:#888;font-size:10px;">${r.sub}</span></td>
+      <td style="text-align:center;"><span style="padding:2px 5px;border-radius:2px;font-size:9px;font-weight:700;background:${typeColor[r.type]||'#333'};color:white;">${r.type}</span></td>
+      <td style="text-align:center;font-weight:800;font-size:13px;font-family:monospace;color:#1a237e;letter-spacing:1px;">${r.pass}${badge}</td>
+      <td style="text-align:center;"><button onclick="navigator.clipboard.writeText('${r.pass}').then(()=>{this.textContent='✅';setTimeout(()=>this.textContent='📋',1100);})" style="padding:3px 7px;border:1px solid #ce93d8;border-radius:3px;background:#f3e5f5;cursor:pointer;font-size:11px;" title="Copy">📋</button></td>
+      <td style="text-align:center;"><button onclick="openPwChange('${r.id}','${r.label}')" style="padding:3px 7px;border:1px solid #9fa8da;border-radius:3px;background:#e8eaf6;cursor:pointer;font-size:11px;" title="Password बदलें">✏️</button></td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+}
+function filterPwPanel(){ renderPwPanel(); }
+function copyAllPasswords(){
+  const {jd,deo,dpi}=_getPwEntries();
+  let text='=== DPI ===\n'+dpi.map(r=>r.id+'\t'+r.pass).join('\n');
+  text+='\n\n=== JD PASSWORDS ===\n'+jd.map(r=>r.id+'\t'+r.pass).join('\n');
+  text+='\n\n=== DEO PASSWORDS ===\n'+deo.map(r=>r.id+' ('+r.label+')\t'+r.pass).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{ myAlert('✅ सभी Passwords Clipboard में Copy हो गए!'); });
+}
+
+// ─── CHANGE PASSWORD ───
+function openPwChange(userId, label){
+  _pwChangeTarget=userId;
+  document.getElementById('pwChangeLabel').textContent='✏️ '+label+' ('+userId+')';
+  document.getElementById('pwChangeNew').value='';
+  document.getElementById('pwChangeConfirm').value='';
+  document.getElementById('pwChangeMsg').textContent='';
+  document.getElementById('pwChangeBox').style.display='flex';
+  setTimeout(()=>document.getElementById('pwChangeNew').focus(),100);
+}
+function closePwChange(){
+  document.getElementById('pwChangeBox').style.display='none';
+  _pwChangeTarget=null;
+}
+function pwChangePreview(){
+  const np=document.getElementById('pwChangeNew').value;
+  const cp=document.getElementById('pwChangeConfirm').value;
+  if(cp&&np!==cp) document.getElementById('pwChangeMsg').innerHTML='<span style="color:red;">❌ Passwords match नहीं हैं</span>';
+  else document.getElementById('pwChangeMsg').textContent='';
+}
+function savePwChange(){
+  if(!_pwChangeTarget){closePwChange();return;}
+  const np=(document.getElementById('pwChangeNew').value||'').trim();
+  const cp=(document.getElementById('pwChangeConfirm').value||'').trim();
+  if(!np){document.getElementById('pwChangeMsg').innerHTML='<span style="color:red;">❌ नया Password खाली नहीं हो सकता।</span>';return;}
+  if(np!==cp){document.getElementById('pwChangeMsg').innerHTML='<span style="color:red;">❌ दोनों Passwords मेल नहीं खाते।</span>';return;}
+  if(np.length<3){document.getElementById('pwChangeMsg').innerHTML='<span style="color:red;">❌ Password कम से कम 3 अक्षर का होना चाहिए।</span>';return;}
+  const custom=window._customPasswords||{};
+  const oldPass=custom[_pwChangeTarget]||districtCredentials[_pwChangeTarget]||'-';
+  custom[_pwChangeTarget]=np;
+  window._customPasswords=custom;
+  // Log it
+  const entry={userId:_pwChangeTarget,dateTime:new Date().toLocaleString('en-IN',{hour12:true}),timestamp:Date.now(),resetBy:window.currentUser||'DPI',oldPass,newPass:np};
+  const log=JSON.parse(localStorage.getItem('pwResetLog')||'[]');
+  log.unshift(entry);
+  localStorage.setItem('pwResetLog',JSON.stringify(log.slice(0,200)));
+  if(typeof savePwResetLogCloud==='function') savePwResetLogCloud(entry);
+  auditLog&&auditLog('PASSWORD_CHANGED','DPI changed password for: '+_pwChangeTarget);
+  document.getElementById('pwChangeMsg').innerHTML='<span style="color:green;">✅ Password सफलतापूर्वक बदल गया!</span>';
+  setTimeout(()=>{closePwChange();renderPwPanel();},900);
+}
+function resetToDefault(){
+  if(!_pwChangeTarget) return;
+  if(!confirm(_pwChangeTarget+' का Password Default पर Reset करें?')) return;
+  const custom=window._customPasswords||{};
+  delete custom[_pwChangeTarget];
+  window._customPasswords=custom;
+  document.getElementById('pwChangeMsg').innerHTML='<span style="color:#e65100;">↺ Default Password Restore हो गया!</span>';
+  setTimeout(()=>{closePwChange();renderPwPanel();},800);
+}
 function toggleDPI(){const p=document.getElementById('dpiControlPanel');p.style.display=p.style.display==='none'||!p.style.display?'block':'none';document.getElementById('dpiStartDate').value=window._psStart||'';document.getElementById('dpiEndDate').value=window._psEnd||'';}
 function saveTimeLimit(){const s=document.getElementById('dpiStartDate').value,e=document.getElementById('dpiEndDate').value;if(!s||!e){myAlert('Please select both dates.');return;}window._psStart=s;window._psEnd=e;updateDeadlineBadge();myAlert('✅ Access period updated.');toggleDPI();checkLockStatus();}
 function checkLockStatus(){const s=window._psStart,e=window._psEnd;if(!s||!e)return;const today=new Date().toISOString().split('T')[0];if(today<s||today>e){document.getElementById('lockScreen').style.display='flex';document.getElementById('lockMsg').textContent=`Portal accessible from ${s} to ${e}. Access has ended.`;}else{document.getElementById('lockScreen').style.display='none';}}
@@ -1260,7 +1535,7 @@ function checkLogin(){
     if(JD_DISTRICTS[user]){
       document.getElementById('in23').value=user.replace('JD','JD ');
     }
-    if(user==='DPI'){showDpiClearButtons();var tb=document.getElementById('sheetTitleEditBtn');if(tb)tb.style.display='inline-block';}
+    if(user==='DPI'){showDpiClearButtons();var tb=document.getElementById('sheetTitleEditBtn');if(tb)tb.style.display='inline-block';var pb=document.getElementById('pwPanelBtn');if(pb)pb.style.display='inline-block';}
     // ─── Scope Badge ───
     updateScopeBadge(user);
     // Rebuild table head to show/hide office-only columns based on role
@@ -1274,7 +1549,14 @@ function checkLogin(){
     // ── REALTIME: Reset supabase client so realtime config applies, then init ──
     _supabase = null; // force fresh client with realtime options
     if(typeof initRealtime === 'function') initRealtime();
-    loadDataFromSupabase().then(ok=>{if(ok){renderVirtual();updateStorageBadge(true);}});
+    if(currentUser==='DPI'){
+      window.dpiSelectedDivision = null;
+      var cdBtn = document.getElementById('changeDivisionBtn');
+      if(cdBtn) cdBtn.style.display = 'inline-block';
+      showDpiDivisionSelector(false);
+    } else {
+      loadDataFromSupabase().then(function(ok){if(ok){renderVirtual();updateStorageBadge(true);}});
+    }
   }else{
     let att=(window._loginAttempts[ak]||0)+1;window._loginAttempts[ak]=att;
     if(att>=3){window._loginBlocks[bk]={until:Date.now()+5*60*1000};delete window._loginAttempts[ak];err.textContent='🔒 Account locked for 5 minutes.';}
@@ -1304,13 +1586,15 @@ function logoutUser(){
   if(!confirm('Are you sure you want to log out?'))return;
   // Cleanup realtime — delete from ps_online_users table
   if(typeof _psCleanupRealtime === 'function') _psCleanupRealtime();
-  currentUser=null;window.currentUser=null;
+  currentUser=null;window.currentUser=null;window.dpiSelectedDivision=null;
   document.getElementById('loginOverlay').style.display='flex';
   document.getElementById('userBadge').style.display='none';
   document.getElementById('logoutBtn').style.display='none';
   document.getElementById('sessionUser').textContent='';
   const sb=document.getElementById('scopeBadge');if(sb)sb.style.display='none';
   var tb=document.getElementById('sheetTitleEditBtn');if(tb)tb.style.display='none';
+  var cdBtn=document.getElementById('changeDivisionBtn');if(cdBtn)cdBtn.style.display='none';
+  var pb=document.getElementById('pwPanelBtn');if(pb)pb.style.display='none';
   buildTableHead();buildFilterRow();renderVirtual();
 }
 // ═══════════════════════════════════════════════
@@ -1605,12 +1889,95 @@ window.onload=function(){
   document.addEventListener('click',e=>{if(!e.target.closest('#otherToolbarWrap'))closeOtherToolbar();});
 };
 
+// ─────────────────────────────────────────
+//  DPI DIVISION SELECTOR
+// ─────────────────────────────────────────
+window.dpiSelectedDivision = null;
+window.DPI_DIVISION_INFO = {
+  'JDBHOPAL':       {label:'भोपाल संभाग',      icon:'🏛️', color:'#1565c0', bg:'rgba(21,101,192,0.18)',  districts:['Bhopal','Raisen','Rajgarh','Sehore','Vidisha']},
+  'JDGWALIOR':      {label:'ग्वालियर संभाग',    icon:'🏯', color:'#6a1b9a', bg:'rgba(106,27,154,0.18)', districts:['Ashoknagar','Bhind','Datia','Guna','Gwalior','Morena','Sheopur','Shivpuri']},
+  'JDINDORE':       {label:'इंदौर संभाग',       icon:'🏙️', color:'#00695c', bg:'rgba(0,105,92,0.18)',   districts:['Alirajpur','Barwani','Burhanpur','Dhar','Indore','Jhabua','Khandwa','Khargone']},
+  'JDJABALPUR':     {label:'जबलपुर संभाग',      icon:'🌿', color:'#2e7d32', bg:'rgba(46,125,50,0.18)',  districts:['Balaghat','Chhindwara','Dindori','Jabalpur','Katni','Mandla','Narsinghpur','Seoni']},
+  'JDUJJAIN':       {label:'उज्जैन संभाग',      icon:'🛕', color:'#e65100', bg:'rgba(230,81,0,0.18)',   districts:['Agar Malwa','Dewas','Mandsaur','Neemuch','Ratlam','Shajapur','Ujjain']},
+  'JDSAGAR':        {label:'सागर संभाग',        icon:'💎', color:'#37474f', bg:'rgba(55,71,79,0.18)',   districts:['Chhatarpur','Damoh','Niwari','Panna','Sagar','Tikamgarh']},
+  'JDREWA':         {label:'रीवा संभाग',        icon:'🏔️', color:'#880e4f', bg:'rgba(136,14,79,0.18)',  districts:['Rewa','Satna','Sidhi','Singrauli']},
+  'JDNARMADAPURAM': {label:'नर्मदापुरम संभाग', icon:'🌊', color:'#01579b', bg:'rgba(1,87,155,0.18)',   districts:['Betul','Harda','Narmadapuram']},
+  'JDSHAHDOL':      {label:'शहडोल संभाग',      icon:'🌲', color:'#4e342e', bg:'rgba(78,52,46,0.18)',   districts:['Anuppur','Shahdol','Umaria']}
+};
+
+function showDpiDivisionSelector(fromBtn){
+  var grid = document.getElementById('divisionGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  var sel = window.dpiSelectedDivision;
+  Object.keys(window.DPI_DIVISION_INFO).forEach(function(key){
+    var info = window.DPI_DIVISION_INFO[key];
+    var isActive = (sel === key);
+    var card = document.createElement('div');
+    card.className = 'div-card' + (isActive ? ' active' : '');
+    card.style.borderColor = isActive ? info.color : 'rgba(255,255,255,0.15)';
+    card.style.background  = isActive ? info.bg    : 'rgba(255,255,255,0.05)';
+    card.innerHTML =
+      '<div style="font-size:20px;margin-bottom:4px;">' + info.icon + '</div>' +
+      '<div style="font-size:11px;font-weight:800;color:' + (isActive?'#fff':'#cfd8dc') + ';line-height:1.3;">' + info.label + '</div>' +
+      '<div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:3px;">' + info.districts.length + ' जिले</div>' +
+      (isActive ? '<div style="font-size:9px;color:#4caf50;font-weight:700;margin-top:2px;">✔ वर्तमान</div>' : '');
+    card.onclick = (function(k){ return function(){ dpiSelectDivision(k); }; })(key);
+    card.onmouseover = (function(c,b,a){ return function(){ this.style.background=b; this.style.borderColor=c; if(!a)this.style.filter='brightness(1.2)'; }; })(info.color, info.bg, isActive);
+    card.onmouseout  = (function(c,b,a){ return function(){ this.style.background=a?b:'rgba(255,255,255,0.05)'; this.style.borderColor=a?c:'rgba(255,255,255,0.15)'; this.style.filter=''; }; })(info.color, info.bg, isActive);
+    grid.appendChild(card);
+  });
+  var modal = document.getElementById('dpiDivisionModal');
+  if(modal) modal.style.display = 'flex';
+}
+
+async function dpiSelectDivision(divKey){
+  window.dpiSelectedDivision = divKey;
+  var modal = document.getElementById('dpiDivisionModal');
+  if(modal) modal.style.display = 'none';
+  // Update toolbar label
+  var lbl = document.getElementById('currentDivLabel');
+  if(lbl){
+    if(divKey === 'ALL') lbl.textContent = '🌐 सभी संभाग';
+    else {
+      var info = window.DPI_DIVISION_INFO[divKey];
+      lbl.textContent = info ? info.label : divKey;
+    }
+  }
+  // Update scope badge
+  _updateDpiScopeBadge(divKey);
+  // Reload data
+  var ov = document.getElementById('dataLoadingOverlay');
+  if(ov) ov.style.display = 'flex';
+  var ok = await loadDataFromSupabase();
+  if(ok){ renderVirtual(); updateStorageBadge(true); }
+}
+
+function _updateDpiScopeBadge(divKey){
+  var badge = document.getElementById('scopeBadge');
+  if(!badge) return;
+  badge.style.display = 'inline-block';
+  if(divKey === 'ALL'){
+    badge.style.background='#1a237e'; badge.style.border='1px solid #3949ab'; badge.style.color='white';
+    badge.textContent = '🌐 DPI — सम्पूर्ण मध्यप्रदेश';
+  } else {
+    var info = window.DPI_DIVISION_INFO[divKey];
+    badge.style.background = info ? info.color : '#1a237e';
+    badge.style.border = '1px solid rgba(255,255,255,0.3)';
+    badge.style.color = 'white';
+    badge.textContent = info ? (info.icon + ' DPI — ' + info.label) : ('DPI — ' + divKey);
+    if(info) badge.title = info.districts.join(', ');
+  }
+}
+
 function isOfficeUser(){return window.currentUser==='DPI'||String(window.currentUser||'').startsWith('JD');}
+function isDpiUser(){return window.currentUser==='DPI';}
 function buildTableHead(){
   const h=document.getElementById('tableHead');
   h.innerHTML='';
   colConfig.forEach((c,i)=>{
     if(c.officeOnly&&!isOfficeUser())return;
+    if(c.dpiOnly&&!isDpiUser())return;
     const th=document.createElement('th');
     th.className=c.cls;th.innerText=c.name;
     if(c.officeOnly){th.style.background='#1a237e';th.style.color='#fff';th.title='Office Use Only';}
@@ -1623,6 +1990,7 @@ function buildFilterRow(){
   fr.innerHTML='';
   colConfig.forEach((c,i)=>{
     if(c.officeOnly&&!isOfficeUser())return;
+    if(c.dpiOnly&&!isDpiUser())return;
     const th=document.createElement('th');
     const inp=document.createElement('input');
     inp.type='text';inp.placeholder='🔍';
@@ -1639,8 +2007,9 @@ function runAllFilters(){
   window.filteredData=window.fullData.filter(row=>inputs.every(inp=>{
     const f=inp.value.trim().toLowerCase();if(!f)return true;
     const ci=parseInt(inp.dataset.colIdx||'0');
-    if(ci===30)return(row._doc&&row._doc.name||'').toLowerCase().includes(f);
-    return(row['field'+(ci+1)]||'').toString().toLowerCase().includes(f);
+    const fi = colConfig[ci] && colConfig[ci].fi !== undefined ? colConfig[ci].fi : (ci+1);
+    if(fi===31)return(row._doc&&row._doc.name||'').toLowerCase().includes(f);
+    return(row['field'+fi]||'').toString().toLowerCase().includes(f);
   }));renderVirtual();
 }
 
@@ -1705,6 +2074,7 @@ function _getVSData(){
 
 function _buildPSRow(row, i){
   const officeOk = isOfficeUser();
+  const dpiOk = isDpiUser();
   const tr = document.createElement('tr');
   if(row._softDeleted) tr.classList.add('row-deleted');
   tr.dataset.uid = row.field2||('row_'+i);
@@ -1719,28 +2089,30 @@ function _buildPSRow(row, i){
 
   for(let ci=0; ci<colConfig.length; ci++){
     if(colConfig[ci].officeOnly && !officeOk) continue;
+    if(colConfig[ci].dpiOnly && !dpiOk) continue;
     const td = document.createElement('td');
-    const val = row['field'+(ci+1)]||'';
+    const fi = colConfig[ci].fi !== undefined ? colConfig[ci].fi : (ci+1);
+    const val = row['field'+fi]||'';
     td.className = colConfig[ci].cls;
 
     if(ci===0){
       if(row._softDeleted) td.innerHTML='<span class="badge badge-deleted">DELETED</span>';
       else td.textContent = String(i+1);
     }
-    else if(ci===4&&(val==='M'||val==='F')){
+    else if(fi===5&&(val==='M'||val==='F')){
       td.innerHTML=`<span style="background:${val==='M'?'#1565c0':'#ad1457'};color:white;padding:1px 6px;border-radius:2px;font-size:10px;font-weight:700;">${val}</span>`;
     }
-    else if(ci===28){
+    else if(fi===29){
       const st=row.field29||'';
       const badgeCls=st==='Deleted'?'badge-deleted':st.includes('New')?'badge-new':'badge-updated';
       if(st) td.innerHTML=`<span class="badge ${badgeCls}">${st}</span>`;
       else td.textContent='';
     }
-    else if(ci===29){
+    else if(fi===30){
       const t=row.field30||'';
       td.innerHTML=`<span style="${t.includes('Updated')?'color:#1565c0;font-weight:700;':''}">${t}</span>`;
     }
-    else if(ci===30){
+    else if(fi===31){
       if(row._doc&&row._doc.name){
         const btn=document.createElement('button');
         btn.textContent='👁 VIEW';
@@ -1751,16 +2123,16 @@ function _buildPSRow(row, i){
         td.innerHTML='<span style="color:#bbb;font-size:10px;">No Doc</span>';
       }
     }
-    else if(ci>=31&&ci<=38){
-      const cval=csVals[ci-31]||'';
+    else if(fi>=32&&fi<=39){
+      const cval=csVals[fi-32]||'';
       td.style.background='#e8eaf6';
       td.style.color=cval?'#1a237e':'#aaa';
       td.style.fontWeight=cval?'700':'400';
       td.textContent=cval||'—';
       td.title='Office Use Only';
     }
-    else if(ci>=39&&ci<=42){
-      const fval=csVals[ci-31]||'';
+    else if(fi>=40&&fi<=43){
+      const fval=csVals[fi-32]||'';
       td.style.background=fval?'#e8f5e9':'#f5f5f5';
       td.style.color=fval?'#1b5e20':'#aaa';
       td.style.fontWeight=fval?'800':'400';
@@ -1769,9 +2141,9 @@ function _buildPSRow(row, i){
       td.title='Final Counselling Subject';
     }
     else{
-      const isDateCol=(ci===5||ci===16||ci===17||ci===18);
+      const isDateCol=(fi===6||fi===17||fi===18||fi===19);
       const dispVal=isDateCol?fmtDate(val):val;
-      const cf=row._changedFields&&row._changedFields[ci];
+      const cf=row._changedFields&&row._changedFields[fi];
       if(cf!==undefined&&cf!==null&&cf.from!==val){
         td.innerHTML=`<span style="background:#fff3cd;padding:1px 3px;border-radius:2px;" title="Was: ${fmtDate(cf.from)||'(empty)'}">${dispVal}</span>`;
         td.classList.add('cell-changed');
@@ -1933,16 +2305,16 @@ function handleTransferMode(){const mode=document.getElementById('in19mode').val
 
 // ─── UG SUBJECT MAPPING ───
 const ugSubjectMap = {
-  'B.A.'           : ['Hindi Literature','English Literature','Sanskrit Literature','History','Geography','Political Science','Economics','Sociology','Psychology','Home Science','Urdu Literature','NIL'],
-  'B.Sc. In Maths' : ['Maths','Physics','Chemistry','Computer Science','NIL'],
-  'B.Sc. In Science': ['Physics','Chemistry','Biology','Botany','Zoology','NIL'],
-  'B.Com.'         : ['Commerce','Economics','NIL'],
-  'BCA'            : ['Computer Science','Maths','NIL'],
-  'BBA'            : ['Commerce','Economics','NIL'],
-  'B.Tech.'        : ['Physics','Chemistry','Maths','Computer Science','NIL'],
+  'B.A.'           : ['Hindi Literature','English Literature','Sanskrit Literature','History','Geography','Political Science','Economics','Sociology','Psychology','Home Science','Urdu Literature'],
+  'B.Sc. In Maths' : ['Maths','Physics','Chemistry','Computer Science'],
+  'B.Sc. In Science': ['Physics','Chemistry','Biology','Botany','Zoology'],
+  'B.Com.'         : ['Commerce','Economics'],
+  'BCA'            : ['Computer Science','Maths'],
+  'BBA'            : ['Commerce','Economics'],
+  'B.Tech.'        : ['Physics','Chemistry','Maths','Computer Science'],
   'NIL'            : ['NIL'],
 };
-const allSubjects = ['Biology','Botany','Chemistry','Commerce','Computer Science','Economics','English Literature','Geography','Hindi Literature','History','Home Science','Maths','Physics','Political Science','Psychology','Sanskrit Literature','Sociology','Urdu Literature','Zoology','NIL'];
+const allSubjects = ['Biology','Botany','Chemistry','Commerce','Computer Science','Economics','English Literature','Geography','Hindi Literature','History','Home Science','Maths','Physics','Political Science','Psychology','Sanskrit Literature','Sociology','Urdu Literature','Zoology'];
 
 function refreshSubjectDisable(sub1Id, sub2Id, sub3Id) {
   const ids = [sub1Id, sub2Id, sub3Id];
@@ -1961,17 +2333,30 @@ function refreshSubjectDisable(sub1Id, sub2Id, sub3Id) {
 
 function populateSubjects(ugId, sub1Id, sub2Id, sub3Id) {
   const qual = document.getElementById(ugId).value;
+  // यदि NIL select हो तो तीनों subjects NIL सेट करें
+  if (qual === 'NIL' || qual === '' || !qual) {
+    [sub1Id, sub2Id, sub3Id].forEach(sid => {
+      const sel = document.getElementById(sid);
+      sel.innerHTML = '<option value="NIL">NIL</option>';
+      sel.value = 'NIL';
+      sel.onchange = function(){ refreshSubjectDisable(sub1Id,sub2Id,sub3Id); computeCounsellingSubjects(); };
+    });
+    setTimeout(computeCounsellingSubjects, 50);
+    return;
+  }
   const subjects = ugSubjectMap[qual] || allSubjects;
   [sub1Id, sub2Id, sub3Id].forEach(sid => {
     const sel = document.getElementById(sid);
     const prev = sel.value;
-    sel.innerHTML = '<option value="">SELECT</option>';
+    sel.innerHTML = '<option value="">-- SELECT --</option>';
     subjects.forEach(s => {
       const o = document.createElement('option');
       o.value = s; o.textContent = s;
       sel.appendChild(o);
     });
-    if (subjects.includes(prev)) sel.value = prev;
+    // prev value restore करें यदि valid है (NIL नहीं या subjects में है)
+    if (subjects.includes(prev) && prev !== 'NIL') sel.value = prev;
+    else if (subjects.includes(prev)) sel.value = prev;
     sel.onchange = function(){ refreshSubjectDisable(sub1Id,sub2Id,sub3Id); computeCounsellingSubjects(); };
   });
   refreshSubjectDisable(sub1Id, sub2Id, sub3Id);
@@ -2471,7 +2856,7 @@ function buildRowFromForm(isNew,now){
     field21:document.getElementById('in21').value,
     field22:'',
     field23:document.getElementById('in23').value,
-    field24:document.getElementById('in24').value,
+    field24:document.getElementById('in24').value.trim()||'NO',
     field25:document.getElementById('in25').value||'NO',
     field26:document.getElementById('in26').value,
     field27:document.getElementById('in27').value,
@@ -2532,22 +2917,23 @@ function handleUpdateClick(){
   updated.field31=oldRecord.field31||'';
   updated._doc=oldRecord._doc||null;
   // Cumulative _changedFields — purane highlights preserve karo, naye add karo
-  const SKIP_CI=new Set([28,29,30]); // field29,30,31 = Status/UpdatedBy/Doc — skip
+  const SKIP_FI=new Set([29,30,31]); // field29,30,31 = Status/UpdatedBy/Doc — skip
   const prevChanged=oldRecord._changedFields||{};
   const changedSet=Object.assign({},prevChanged); // pehle se jo highlighted tha wo copy karo
   for(let ci=0;ci<colConfig.length;ci++){
-    if(SKIP_CI.has(ci))continue;
-    const fk='field'+(ci+1);
+    const fi = colConfig[ci].fi !== undefined ? colConfig[ci].fi : (ci+1);
+    if(SKIP_FI.has(fi))continue;
+    const fk='field'+fi;
     const ov=(oldRecord[fk]||'').toString().trim();
     const nv=(updated[fk]||'').toString().trim();
     if(ov!==nv){
       // Is field mein change aaya — original "from" preserve karo
-      const origFrom=prevChanged[ci]?prevChanged[ci].from:ov;
+      const origFrom=prevChanged[fi]?prevChanged[fi].from:ov;
       if(origFrom===nv){
         // Value wapas original pe aagayi — highlight hatao
-        delete changedSet[ci];
+        delete changedSet[fi];
       } else {
-        changedSet[ci]={from:origFrom,to:nv};
+        changedSet[fi]={from:origFrom,to:nv};
       }
     }
     // ov===nv — is field mein koi change nahi is update mein
@@ -2628,7 +3014,7 @@ function loadRecord(uid){
   fields.forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
-    const val = rec[fmap[id]] || '';
+    const val = id==='in24' ? (rec[fmap[id]]||'NO') : (rec[fmap[id]] || '');
     if (el.tagName === 'SELECT') {
       setSelectVal(id, val);
     } else {
@@ -2715,6 +3101,7 @@ function clearForm(){
   document.getElementById('deleteBtn').style.display='none';
   const deo=DEO_DISTRICT[currentUser];
   if(deo){document.getElementById('in23').value=deo;document.getElementById('in23').disabled=true;}
+  document.getElementById('in24').value='NO';
   document.getElementById('in25').value='';handleUPPLogic();
   currentDocData=null;
   const fnd=document.getElementById('fileNameDisplay');if(fnd)fnd.textContent='Click to Select File (PDF/JPG)';
@@ -2753,12 +3140,12 @@ function exportExcel(){
   // Columns 0-28: S.N. through Updated By (skip field23 duplicate)
   // Skip: View Document (index 29) + काउं. विषय columns (indices 30-37)
   // Include: फाइनल काउं. विषय-1 to 4 (computed via getRowCounsellingData)
-  const pdfColConfig = colConfig.filter((c,i) => i < 29 && !c.officeOnly);
-  const pdfFieldNums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29,30];
-  const finalCSHeaders = ['फाइनल काउं. विषय-1','फाइनल काउं. विषय-2','फाइनल काउं. विषय-3','फाइनल काउं. विषय-4'];
-  const headers = pdfColConfig.map(c=>c.name).concat(finalCSHeaders);
-  const rows=window.filteredData.map(r=>{
-    const base = pdfFieldNums.map(fn=>r['field'+fn]||'');
+  // Build using fi for accurate field mapping
+  const xlsCols = colConfig.filter(c => !c.officeOnly && c.fi !== 31);
+  const finalCSHeaders = ['Final CS Sub-1','Final CS Sub-2','Final CS Sub-3','Final CS Sub-4'];
+  const headers = xlsCols.map(c=>c.name).concat(finalCSHeaders);
+  const rows = window.filteredData.map(r=>{
+    const base = xlsCols.map(c => r['field'+c.fi]||'');
     const csVals = getRowCounsellingData(r);
     const finals = [csVals[8]||'', csVals[9]||'', csVals[10]||'', csVals[11]||''];
     return base.concat(finals);
@@ -2831,15 +3218,20 @@ function exportPDF(){
 
   addPageHeader();
 
-  // Only include columns up to "Updated By" - exclude View Document & office-only columns
-  // IMPORTANT: field22 & field23 are BOTH "Present District" in DB,
-  // so Remark=field24, उच्च पद ज्वाइन=field25, ..., Updated By=field30
-  const pdfColConfig = colConfig.filter((c,i) => i < 29 && !c.officeOnly);
-  const pdfFieldNums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29,30];
-  const headers=pdfColConfig.map(c=>c.name);
-  const rows=window.filteredData.slice(0,500).map(r=>pdfFieldNums.map(fn=>{
-    return r['field'+fn]||'';
-  }));
+  // Hindi -> English mapping for PDF headers (jsPDF helvetica can't render Devanagari)
+  const hindiToEng = {
+    'उच्च पद ज्वाइन':  'Ucch Pad Join (Y/N)',
+    'उच्च पद शाला':    'Ucch Pad Shala',
+    'उच्च पद UDISE':   'Ucch Pad UDISE',
+    'उच्च पद जिला':    'Ucch Pad Jila',
+  };
+
+  // Build columns using fi -- only non-officeOnly, exclude View Document (fi=31)
+  const pdfCols = colConfig.filter(c => !c.officeOnly && c.fi !== 31);
+  const headers = pdfCols.map(c => hindiToEng[c.name] || c.name);
+  const rows = window.filteredData.slice(0, 500).map(r =>
+    pdfCols.map(c => r['field' + c.fi] || '')
+  );
 
   doc.autoTable({
     head:[headers],
@@ -2866,25 +3258,24 @@ function exportPDF(){
 async function psSummaryUploadDocCloud(officeKey, file) {
   const sb = getSupabase(); if(!sb) return null;
   const ext = file.name.split('.').pop();
-  const path = `ps_summary_docs/${officeKey}_${Date.now()}.${ext}`;
-  const { data, error } = await sb.storage.from('ums-documents').upload(path, file, { upsert: true });
-  if(error){ console.error('PS Upload error:', error); return null; }
-  const { data: urlData } = sb.storage.from('ums-documents').getPublicUrl(path);
-  await sb.from('ps_summary_uploads').upsert({
-    office_key: officeKey,
-    file_name: file.name,
-    file_path: path,
-    public_url: urlData.publicUrl,
-    uploaded_by: window.currentUser || 'UNKNOWN',
-    uploaded_at: new Date().toISOString()
-  }, { onConflict: 'office_key' });
+  const filePath = `ps_summary_docs/${officeKey}.${ext}`;
+  const metaPath = `ps_summary_docs/${officeKey}_meta.json`;
+  const { error: upErr } = await sb.storage.from('ums-documents').upload(filePath, file, {upsert:true});
+  if(upErr){ console.error('PS Upload error:', upErr); return null; }
+  const { data: urlData } = sb.storage.from('ums-documents').getPublicUrl(filePath);
+  const meta = {file_name:file.name, file_path:filePath, public_url:urlData.publicUrl, uploaded_by:window.currentUser||'UNKNOWN', uploaded_at:new Date().toISOString()};
+  const metaBlob = new Blob([JSON.stringify(meta)], {type:'application/json'});
+  await sb.storage.from('ums-documents').upload(metaPath, metaBlob, {upsert:true});
   return urlData.publicUrl;
 }
 async function psGetUploadedDocCloud(officeKey) {
   const sb = getSupabase(); if(!sb) return null;
-  const { data, error } = await sb.from('ps_summary_uploads').select('*').eq('office_key', officeKey).single();
-  if(error || !data) return null;
-  return data;
+  try {
+    const { data, error } = await sb.storage.from('ums-documents').download(`ps_summary_docs/${officeKey}_meta.json`);
+    if(error || !data) return null;
+    const text = await data.text();
+    return JSON.parse(text);
+  } catch(e) { return null; }
 }
 function psSummaryUploadDoc(officeKey){
   const cu = window.currentUser||'';
@@ -2906,22 +3297,29 @@ function psSummaryUploadDoc(officeKey){
   const fi=document.getElementById('psFileUpload_'+officeKey); if(fi) fi.click();
 }
 function psHandleSummaryFileUpload(event, officeKey){
-  const file=event.target.files[0]; if(!file) return;
-  const statusDiv=document.getElementById('psUploadStatus_'+officeKey);
-  if(statusDiv){ statusDiv.innerHTML='⏳ Uploading...'; statusDiv.style.color='#f39c12'; }
-  const reader=new FileReader();
-  reader.onload=async function(){
-    const cloudUrl = await psSummaryUploadDocCloud(officeKey, file);
+  var file = event.target.files[0]; if(!file) return;
+  event.target.value = '';
+  var statusDiv = document.getElementById('psUploadStatus_'+officeKey);
+  if(statusDiv){ statusDiv.innerHTML = '⏳ Uploading...'; statusDiv.style.color = '#f39c12'; }
+  (async function(){
+    var cloudUrl = await psSummaryUploadDocCloud(officeKey, file);
     if(cloudUrl){
-      if(statusDiv){ statusDiv.innerHTML='✅ '+file.name; statusDiv.style.color='#27ae60'; }
+      if(statusDiv){ statusDiv.innerHTML = '✅ '+file.name; statusDiv.style.color = '#27ae60'; }
+      var vc = document.getElementById('psViewContainer_'+officeKey);
+      if(vc){
+        var btn = document.createElement('button');
+        btn.textContent = '👁️ View';
+        btn.style.cssText = 'background:#1565c0;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:bold;';
+        btn.onclick = (function(k){ return function(){ psSummaryViewDoc(k); }; })(officeKey);
+        vc.innerHTML = '';
+        vc.appendChild(btn);
+      }
       myAlert('✅ Document uploaded successfully.\nFile: '+file.name);
     } else {
-      if(statusDiv){ statusDiv.innerHTML='❌ Upload failed.'; statusDiv.style.color='#c62828'; }
-      myAlert('❌ Upload failed. Supabase connected nahi hai.');
+      if(statusDiv){ statusDiv.innerHTML = '❌ Upload failed.'; statusDiv.style.color = '#c62828'; }
+      myAlert('❌ Upload failed. Storage bucket available nahi hai.');
     }
-  };
-  reader.readAsDataURL(file);
-  event.target.value='';
+  })();
 }
 async function psSummaryViewDoc(officeKey){
   const docInfo = await psGetUploadedDocCloud(officeKey);
@@ -3082,18 +3480,23 @@ function showSummary(){
             let uploadBtn = canUpload
               ? `<button onclick="psSummaryUploadDoc('${itemKey}')" style="background:#2e7d32;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:bold;">📤 Upload</button><div id='psUploadStatus_${itemKey}' style='font-size:10px;margin-top:2px;color:#555;'></div>`
               : `<span style="color:#bbb;font-size:10px;">🔒 No Access</span>`;
-            const viewBtnId = 'psViewBtn_'+itemKey;
-            let viewBtn = `<span id="${viewBtnId}" style="color:#aaa;font-size:10px;font-style:italic;">⏳</span>`;
-            (async function(key,btnId){
+            const viewBtnId = 'psViewContainer_'+itemKey;
+            let viewBtn = `<div id="${viewBtnId}"><span style="color:#aaa;font-size:10px;font-style:italic;">⏳</span></div>`;
+            (async function(key,cId){
               const doc = await psGetUploadedDocCloud(key);
-              const el = document.getElementById(btnId);
+              const el = document.getElementById(cId);
               if(!el) return;
               if(doc && doc.public_url){
-                el.outerHTML=`<button onclick="psSummaryViewDoc('${key}')" style="background:#1565c0;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:bold;">👁️ View</button>`;
+                const b = document.createElement('button');
+                b.textContent = '👁️ View';
+                b.style.cssText = 'background:#1565c0;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:bold;';
+                b.onclick = (function(k2){ return function(){ psSummaryViewDoc(k2); }; })(key);
+                el.innerHTML=''; el.appendChild(b);
               } else {
-                el.outerHTML=`<span style="color:#aaa;font-size:10px;font-style:italic;">No Document</span>`;
+                el.innerHTML='<span style="color:#aaa;font-size:10px;font-style:italic;">No Document</span>';
               }
             })(itemKey, viewBtnId);
+
             return `<tr style="border-bottom:1px solid #000;${item.type==='JD'?'background:#e8f1ff;font-weight:600;color:#0d47a1;':''}">
               <td style="padding:2px 10px;border-right:1px solid #000;white-space:nowrap;color:black!important;">${item.type==='JD'?item.name:'DEO '+item.name}</td>
               <td style="padding:2px 8px;text-align:center;border-right:1px solid #000;font-weight:bold;color:black!important;">${item.total}</td>
