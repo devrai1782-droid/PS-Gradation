@@ -191,7 +191,14 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
 .load-box{background:white;border-radius:12px;padding:32px 40px;text-align:center;min-width:340px;box-shadow:0 10px 40px rgba(0,0,0,.4);}
 .load-progress{background:#eee;border-radius:20px;overflow:hidden;height:16px;margin:14px 0 8px;}
 #dataLoadBar{width:0%;height:100%;background:linear-gradient(90deg,#002e5b,#1565c0);transition:width .3s;border-radius:20px;}
-#dpiControlPanel{display:none;position:fixed;top:60px;right:20px;z-index:10000;background:white;border:2px solid #333;border-radius:10px;padding:20px;width:280px;box-shadow:0 8px 30px rgba(0,0,0,.3);}
+#dpiControlPanel{display:none;position:fixed;top:60px;right:20px;z-index:10000;background:white;border:2px solid #333;border-radius:10px;padding:20px;width:370px;max-height:88vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);}
+.ap-dist-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.ap-dist-row:hover{background:#f8f9fa;}
+.ap-dist-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+.ap-dist-row .ap-dist-name{flex:1;font-size:12px;font-weight:600;color:#333;}
+.ap-dist-status{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;white-space:nowrap;}
+.ap-status-open{background:#dcfce7;color:#166534;}
+.ap-status-closed{background:#fee2e2;color:#991b1b;}
 .otb-item{display:block;width:100%;text-align:left;padding:7px 14px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;color:#333;}
 .otb-item:hover{background:#f0f4f8;color:#002e5b;}
 @keyframes blinkBtn{0%,100%{opacity:1;}50%{opacity:.55;}}
@@ -298,7 +305,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
   .auto-info{font-size:.68em;}
 
   /* DPI panel */
-  #dpiControlPanel{width:90%;right:5%;top:50px;}
+  #dpiControlPanel{width:94%;right:3%;top:50px;}
 
   /* Summary modal */
   .summary-card-header{padding:10px 12px;font-size:12px;}
@@ -508,17 +515,65 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
   </div>
 </div>
 
-<!-- DPI ADMIN PANEL -->
+<!-- DPI/JD ADMIN PANEL -->
 <div id="dpiControlPanel">
-  <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding-bottom:10px;margin-bottom:14px;">
-    <h4 style="margin:0;color:#333;">DPI Admin Panel</h4>
-    <button onclick="toggleDPI()" style="background:none;border:none;cursor:pointer;font-size:18px;">×</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #002e5b;padding-bottom:10px;margin-bottom:14px;">
+    <h4 id="apPanelTitle" style="margin:0;color:#002e5b;font-size:14px;">⚙️ Admin Panel</h4>
+    <button onclick="closeAdminPanel()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#555;">×</button>
   </div>
-  <label style="font-size:12px;color:#666;font-weight:bold;">Start Date:</label>
-  <input type="date" id="dpiStartDate" style="width:100%;padding:8px;margin:5px 0 14px;border:1px solid #ddd;border-radius:5px;">
-  <label style="font-size:12px;color:#666;font-weight:bold;">End Date:</label>
-  <input type="date" id="dpiEndDate" style="width:100%;padding:8px;margin:5px 0 14px;border:1px solid #ddd;border-radius:5px;">
-  <button onclick="saveTimeLimit()" style="width:100%;background:#002e5b;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:600;">Update Access Limit</button>
+
+  <!-- ── Section: Date Access Limit ── -->
+  <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">📅 Portal Access Period</div>
+  <label style="font-size:12px;color:#555;font-weight:700;display:block;margin-bottom:3px;">Start Date:</label>
+  <input type="date" id="dpiStartDate" style="width:100%;padding:8px;margin-bottom:10px;border:1px solid #ddd;border-radius:5px;font-size:13px;">
+  <label style="font-size:12px;color:#555;font-weight:700;display:block;margin-bottom:3px;">End Date:</label>
+  <input type="date" id="dpiEndDate" style="width:100%;padding:8px;margin-bottom:10px;border:1px solid #ddd;border-radius:5px;font-size:13px;">
+  <button onclick="saveTimeLimit()" style="width:100%;background:#002e5b;color:white;border:none;padding:9px;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px;margin-bottom:16px;">📅 Update Access Limit</button>
+
+  <hr style="border:none;border-top:2px solid #eee;margin-bottom:14px;">
+
+  <!-- ── Section: JD Portal Control (DPI only) ── -->
+  <div id="apJdControlSection" style="display:none;">
+    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">🔒 JD Portal Control <span style="color:#c62828;">(DPI Only)</span></div>
+    <div id="apJdList" style="border:1.5px solid #e0e0e0;border-radius:7px;padding:6px 8px;background:#fafafa;margin-bottom:8px;"></div>
+    <button onclick="saveJdPortalControl()" style="width:100%;background:#7b1fa2;color:white;border:none;padding:9px;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px;margin-bottom:14px;">💾 JD Portal Status Save करें</button>
+    <hr style="border:none;border-top:2px solid #eee;margin-bottom:14px;">
+  </div>
+
+  <!-- ── Section: Portal District Control ── -->
+  <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">🔒 District Portal Control</div>
+
+  <!-- JD Selector — only for DPI -->
+  <div id="apJdSelectorWrap" style="display:none;margin-bottom:12px;">
+    <label style="font-size:12px;font-weight:700;color:#333;display:block;margin-bottom:5px;">JD संभाग चुनें:</label>
+    <select id="apJdSelect" onchange="loadApDistricts()" style="width:100%;padding:9px;border:1.5px solid #ddd;border-radius:5px;font-size:13px;cursor:pointer;">
+      <option value="">-- JD चुनें --</option>
+      <option value="JDBHOPAL">JD Bhopal — भोपाल संभाग</option>
+      <option value="JDGWALIOR">JD Gwalior — ग्वालियर संभाग</option>
+      <option value="JDINDORE">JD Indore — इंदौर संभाग</option>
+      <option value="JDJABALPUR">JD Jabalpur — जबलपुर संभाग</option>
+      <option value="JDUJJAIN">JD Ujjain — उज्जैन संभाग</option>
+      <option value="JDSAGAR">JD Sagar — सागर संभाग</option>
+      <option value="JDREWA">JD Rewa — रीवा संभाग</option>
+      <option value="JDNARMADAPURAM">JD Narmadapuram — नर्मदापुरम संभाग</option>
+      <option value="JDSHAHDOL">JD Shahdol — शहडोल संभाग</option>
+    </select>
+  </div>
+
+  <!-- District Checkboxes -->
+  <div id="apDistrictList" style="max-height:230px;overflow-y:auto;border:1.5px solid #e0e0e0;border-radius:7px;padding:6px 8px;background:#fafafa;margin-bottom:10px;">
+    <div style="color:#aaa;font-size:12px;text-align:center;padding:20px 0;">⬆️ ऊपर JD चुनें</div>
+  </div>
+
+  <div id="apSelectAllRow" style="display:none;margin-bottom:8px;">
+    <label style="font-size:11px;font-weight:700;color:#555;cursor:pointer;display:flex;align-items:center;gap:6px;">
+      <input type="checkbox" id="apSelectAll" onchange="apToggleAll(this.checked)" style="width:14px;height:14px;">
+      सभी जिले एक साथ बंद/खोलें
+    </label>
+  </div>
+
+  <button onclick="savePortalControl()" style="width:100%;background:#c62828;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;">💾 Portal Status Save करें</button>
+  <div id="apSaveMsg" style="font-size:11px;text-align:center;margin-top:8px;min-height:16px;font-weight:700;"></div>
 </div>
 
 
@@ -578,6 +633,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
         <div style="padding:4px 14px 6px;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;margin:6px 0 4px;">DATA MANAGEMENT</div>
         <button class="otb-item" onclick="(function(){const cu=window.currentUser||'';if(cu!=='DPI'&&!cu.startsWith('JD')){alert('⛔ Sirf JD aur DPI clear kar sakte hain.');return;}const enteredPw=prompt('🔐 Password darj karein (अपना login password):');if(enteredPw===null)return;const correctPw=getEffectivePassword(cu)||'1782';if(enteredPw!==correctPw){alert('❌ Galat password! Login password dalein.');return;}clearDivisionData();closeOtherToolbar();})()" style="color:#c62828;">🗑 CLEAR ALL DATA</button>
         <button id="pwPanelBtn" class="otb-item" onclick="openPwPanel();closeOtherToolbar();" style="display:none;color:#4a148c;font-weight:700;">🔑 PASSWORD PANEL</button>
+        <button id="adminPanelBtn" class="otb-item" onclick="openAdminPanelWithAuth();closeOtherToolbar();" style="display:none;color:#c62828;font-weight:700;">⚙️ ADMIN PANEL (Portal Control)</button>
         <button class="otb-item" onclick="openPwResetLog();closeOtherToolbar();" style="color:#6a1b9a;">🔐 PASSWORD RESET LOG</button>
         <div style="padding:4px 14px 6px;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;margin:6px 0 4px;">ZOOM</div>
         <div style="padding:4px 14px 8px;display:flex;align-items:center;gap:6px;">
@@ -760,8 +816,15 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
         <div class="f-label">UG QUALIFICATION-1</div>
         <select id="in8" class="f-input" onchange="populateSubjects('in8','in9','in10','in11'); computeCounsellingSubjects();">
           <option value="">SELECT</option>
-          <option>B.A.</option><option>B.Sc. In Maths</option><option>B.Sc. In Science</option><option>B.Com.</option>
-          <option>BCA</option><option>BBA</option><option>B.Tech.</option><option>NIL</option>
+          <optgroup label="── सामान्य ──">
+            <option>B.A.</option><option>B.Sc. In Maths</option><option>B.Sc. In Science</option><option>B.Com.</option>
+            <option>BCA</option><option>BBA</option><option>B.Tech.</option>
+          </optgroup>
+          <optgroup label="── व्यावसायिक ──">
+            <option>MBBS</option><option>LLB</option><option>BJMC</option>
+            <option>BSc Agriculture</option><option>BSc Nursing</option>
+          </optgroup>
+          <option>NIL</option>
         </select>
       </div>
 
@@ -848,8 +911,15 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
         <div class="f-label">UG QUALIFICATION-2</div>
         <select id="in12" class="f-input" onchange="populateSubjects('in12','in13','in14','in15'); computeCounsellingSubjects();">
           <option value="">SELECT</option>
-          <option>B.A.</option><option>B.Sc. In Maths</option><option>B.Sc. In Science</option><option>B.Com.</option>
-          <option>BCA</option><option>BBA</option><option>B.Tech.</option><option>NIL</option>
+          <optgroup label="── सामान्य ──">
+            <option>B.A.</option><option>B.Sc. In Maths</option><option>B.Sc. In Science</option><option>B.Com.</option>
+            <option>BCA</option><option>BBA</option><option>B.Tech.</option>
+          </optgroup>
+          <optgroup label="── व्यावसायिक ──">
+            <option>MBBS</option><option>LLB</option><option>BJMC</option>
+            <option>BSc Agriculture</option><option>BSc Nursing</option>
+          </optgroup>
+          <option>NIL</option>
         </select>
       </div>
 
@@ -1024,7 +1094,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
       <div class="row-item">
         <div class="f-num">21</div>
         <div class="f-label">UDISE CODE</div>
-        <input type="text" id="in21" class="f-input" maxlength="11" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <input type="text" id="in21" class="f-input" maxlength="14" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
       </div>
 
       <div class="row-item">
@@ -1055,7 +1125,7 @@ tr.row-locked-external{opacity:0.45!important;pointer-events:none!important;outl
       <div class="row-item">
         <div class="f-num">26</div>
         <div class="f-label">उच्च पद प्रभार की शाला का UDISE कोड</div>
-        <input type="text" id="in27" class="f-input" readonly tabindex="-1" style="background:#bdc3c7;pointer-events:none;cursor:not-allowed;" maxlength="11" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <input type="text" id="in27" class="f-input" readonly tabindex="-1" style="background:#bdc3c7;pointer-events:none;cursor:not-allowed;" maxlength="14" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
       </div>
 
       <div class="row-item">
@@ -1413,7 +1483,7 @@ setInterval(updateClock,1000);updateClock();
 
 // ─── DPI KEY TIMER ───
 let keyTimer;
-window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='a'&&!keyTimer)keyTimer=setTimeout(()=>{if(window.currentUser==='DPI')openDpiPasswordModal();},2000);});
+window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='a'&&!keyTimer)keyTimer=setTimeout(()=>{const cu=window.currentUser;if(cu==='DPI')openDpiPasswordModal();else if(cu&&JD_DISTRICTS[cu])openAdminPanelWithAuth();},2000);});
 window.addEventListener('keyup',e=>{if(e.key.toLowerCase()==='a'){clearTimeout(keyTimer);keyTimer=null;}});
 
 // ─── ALERT ───
@@ -1423,7 +1493,7 @@ window.alert=function(m){myAlert(m);};
 
 // ─── DPI ───
 function openDpiPasswordModal(){document.getElementById('dpiPassModal').style.display='flex';document.getElementById('dpiPassInput').value='';document.getElementById('dpiPassErr').textContent='';setTimeout(()=>document.getElementById('dpiPassInput').focus(),100);}
-function verifyDpiPass(){if(document.getElementById('dpiPassInput').value!=='1782'){document.getElementById('dpiPassErr').textContent='❌ Galat password!';document.getElementById('dpiPassInput').value='';return;}document.getElementById('dpiPassModal').style.display='none';toggleDPI();}
+function verifyDpiPass(){if(document.getElementById('dpiPassInput').value!=='1782'){document.getElementById('dpiPassErr').textContent='❌ Galat password!';document.getElementById('dpiPassInput').value='';return;}document.getElementById('dpiPassModal').style.display='none';openAdminPanelSetup();}
 
 // ─── PASSWORD PANEL ───
 let _pwPanelTab = 'jd';
@@ -1575,17 +1645,244 @@ function resetToDefault(){
   document.getElementById('pwChangeMsg').innerHTML='<span style="color:#e65100;">↺ Default Password Restore हो गया!</span>';
   setTimeout(()=>{closePwChange();renderPwPanel();},800);
 }
-function toggleDPI(){const p=document.getElementById('dpiControlPanel');p.style.display=p.style.display==='none'||!p.style.display?'block':'none';document.getElementById('dpiStartDate').value=window._psStart||'';document.getElementById('dpiEndDate').value=window._psEnd||'';}
-function saveTimeLimit(){const s=document.getElementById('dpiStartDate').value,e=document.getElementById('dpiEndDate').value;if(!s||!e){myAlert('Please select both dates.');return;}window._psStart=s;window._psEnd=e;localStorage.setItem('ps_config_start',s);localStorage.setItem('ps_config_end',e);updateDeadlineBadge();myAlert('✅ Access period updated.');toggleDPI();checkLockStatus();}
+// ─── Admin Panel: open/close helpers ───
+function closeAdminPanel(){document.getElementById('dpiControlPanel').style.display='none';}
+function toggleDPI(){openAdminPanelSetup();}
+
+function openAdminPanelWithAuth(){
+  const cu=window.currentUser;
+  if(!cu)return;
+  const pw=prompt('🔐 Admin Panel Password darj karein (apna login password):');
+  if(pw===null)return;
+  const correctPw=getEffectivePassword(cu)||'5021';
+  if(pw!==correctPw){myAlert('❌ Galat password!');return;}
+  openAdminPanelSetup();
+}
+
+function openAdminPanelSetup(){
+  const cu=window.currentUser;
+  const p=document.getElementById('dpiControlPanel');
+  if(p.style.display==='block'){p.style.display='none';return;}
+
+  // Panel title
+  const titleEl=document.getElementById('apPanelTitle');
+  if(titleEl) titleEl.textContent=cu==='DPI'?'🌐 DPI Admin Panel':'📍 '+cu+' Admin Panel';
+
+  // JD portal control section — DPI only
+  const jdSection=document.getElementById('apJdControlSection');
+  if(jdSection) jdSection.style.display=cu==='DPI'?'block':'none';
+  if(cu==='DPI') loadApJdList();
+
+  // JD selector — only for DPI
+  const jdWrap=document.getElementById('apJdSelectorWrap');
+  if(jdWrap) jdWrap.style.display=cu==='DPI'?'block':'none';
+
+  // Dates
+  document.getElementById('dpiStartDate').value=window._psStart||'';
+  document.getElementById('dpiEndDate').value=window._psEnd||'';
+
+  // Load districts
+  if(cu!=='DPI'){
+    loadApDistricts(); // JD: load their own districts immediately
+  } else {
+    // DPI: clear list, wait for JD selection
+    const sel=document.getElementById('apJdSelect');
+    if(sel)sel.value='';
+    const dl=document.getElementById('apDistrictList');
+    if(dl)dl.innerHTML='<div style="color:#aaa;font-size:12px;text-align:center;padding:20px 0;">⬆️ ऊपर JD चुनें</div>';
+    const sar=document.getElementById('apSelectAllRow');
+    if(sar)sar.style.display='none';
+  }
+
+  document.getElementById('apSaveMsg').textContent='';
+  p.style.display='block';
+}
+
+// ── Load closed JDs from localStorage ──
+function _loadClosedJDs(){
+  try{window._closedJDs=JSON.parse(localStorage.getItem('ps_closed_jds')||'{}');}
+  catch(e){window._closedJDs={};}
+}
+_loadClosedJDs();
+
+function loadApJdList(){
+  _loadClosedJDs();
+  const closed=window._closedJDs||{};
+  const jdList=[
+    {id:'JDBHOPAL',label:'JD Bhopal — भोपाल संभाग'},
+    {id:'JDGWALIOR',label:'JD Gwalior — ग्वालियर संभाग'},
+    {id:'JDINDORE',label:'JD Indore — इंदौर संभाग'},
+    {id:'JDJABALPUR',label:'JD Jabalpur — जबलपुर संभाग'},
+    {id:'JDUJJAIN',label:'JD Ujjain — उज्जैन संभाग'},
+    {id:'JDSAGAR',label:'JD Sagar — सागर संभाग'},
+    {id:'JDREWA',label:'JD Rewa — रीवा संभाग'},
+    {id:'JDNARMADAPURAM',label:'JD Narmadapuram — नर्मदापुरम संभाग'},
+    {id:'JDSHAHDOL',label:'JD Shahdol — शहडोल संभाग'},
+  ];
+  const el=document.getElementById('apJdList');
+  if(!el)return;
+  el.innerHTML=jdList.map(j=>{
+    const isClosed=!!closed[j.id];
+    return `<label class="ap-dist-row">
+      <input type="checkbox" value="${j.id}" ${isClosed?'checked':''} style="width:15px;height:15px;cursor:pointer;flex-shrink:0;" onchange="apOnJdChange(this,'${j.id}')">
+      <span class="ap-dist-name" style="font-size:11px;">${j.label}</span>
+      <span class="ap-dist-status ${isClosed?'ap-status-closed':'ap-status-open'}" id="apJdBadge_${j.id}">${isClosed?'🔴 बंद':'🟢 चालू'}</span>
+    </label>`;
+  }).join('');
+}
+
+function apOnJdChange(cb,jdId){
+  const badge=document.getElementById('apJdBadge_'+jdId);
+  if(!badge)return;
+  badge.className='ap-dist-status '+(cb.checked?'ap-status-closed':'ap-status-open');
+  badge.textContent=cb.checked?'🔴 बंद':'🟢 चालू';
+}
+
+function saveJdPortalControl(){
+  _loadClosedJDs();
+  const cbs=document.querySelectorAll('#apJdList input[type=checkbox]');
+  if(!cbs.length)return;
+  cbs.forEach(cb=>{
+    if(cb.checked)window._closedJDs[cb.value]=true;
+    else delete window._closedJDs[cb.value];
+  });
+  localStorage.setItem('ps_closed_jds',JSON.stringify(window._closedJDs));
+  loadApJdList();
+  const msgEl=document.getElementById('apSaveMsg');
+  if(msgEl){msgEl.style.color='#7b1fa2';msgEl.textContent='✅ JD Portal status save हो गया!';}
+  if(typeof checkLockStatus==='function')checkLockStatus();
+}
+
+// ── Load closed districts from localStorage ──
+function _loadClosedDistricts(){
+  try{window._closedDistricts=JSON.parse(localStorage.getItem('ps_closed_dists')||'{}');}
+  catch(e){window._closedDistricts={};}
+}
+_loadClosedDistricts();
+
+function loadApDistricts(){
+  const cu=window.currentUser;
+  let distList=[];
+  if(cu==='DPI'){
+    const jd=(document.getElementById('apJdSelect')||{}).value;
+    if(!jd){
+      const dl=document.getElementById('apDistrictList');
+      if(dl)dl.innerHTML='<div style="color:#aaa;font-size:12px;text-align:center;padding:20px 0;">⬆️ JD चुनें → जिले दिखेंगे</div>';
+      const sar=document.getElementById('apSelectAllRow');
+      if(sar)sar.style.display='none';
+      return;
+    }
+    distList=JD_DISTRICTS[jd]||[];
+  } else if(JD_DISTRICTS[cu]){
+    distList=JD_DISTRICTS[cu];
+  }
+
+  _loadClosedDistricts();
+  const closed=window._closedDistricts||{};
+
+  const dl=document.getElementById('apDistrictList');
+  if(!dl)return;
+
+  if(!distList.length){
+    dl.innerHTML='<div style="color:#aaa;font-size:12px;text-align:center;padding:20px 0;">कोई जिला नहीं मिला</div>';
+    return;
+  }
+
+  const html=distList.map(d=>{
+    const isClosed=!!closed[d];
+    return `<label class="ap-dist-row">
+      <input type="checkbox" value="${d}" ${isClosed?'checked':''} style="width:15px;height:15px;cursor:pointer;flex-shrink:0;" onchange="apOnDistChange()">
+      <span class="ap-dist-name">${d}</span>
+      <span class="ap-dist-status ${isClosed?'ap-status-closed':'ap-status-open'}">${isClosed?'🔴 बंद':'🟢 चालू'}</span>
+    </label>`;
+  }).join('');
+  dl.innerHTML=html;
+
+  // Show select-all row
+  const sar=document.getElementById('apSelectAllRow');
+  if(sar)sar.style.display='block';
+  _syncSelectAll();
+}
+
+function apOnDistChange(){
+  _syncSelectAll();
+  // Update status badges live
+  const rows=document.querySelectorAll('#apDistrictList .ap-dist-row');
+  rows.forEach(row=>{
+    const cb=row.querySelector('input[type=checkbox]');
+    const badge=row.querySelector('.ap-dist-status');
+    if(!cb||!badge)return;
+    badge.className='ap-dist-status '+(cb.checked?'ap-status-closed':'ap-status-open');
+    badge.textContent=cb.checked?'🔴 बंद':'🟢 चालू';
+  });
+}
+
+function _syncSelectAll(){
+  const cbs=document.querySelectorAll('#apDistrictList input[type=checkbox]');
+  const all=document.getElementById('apSelectAll');
+  if(!all||!cbs.length)return;
+  const checkedCount=[...cbs].filter(c=>c.checked).length;
+  all.checked=checkedCount===cbs.length;
+  all.indeterminate=checkedCount>0&&checkedCount<cbs.length;
+}
+
+function apToggleAll(checked){
+  const cbs=document.querySelectorAll('#apDistrictList input[type=checkbox]');
+  cbs.forEach(cb=>{cb.checked=checked;});
+  apOnDistChange();
+}
+
+function savePortalControl(){
+  _loadClosedDistricts();
+  const cbs=document.querySelectorAll('#apDistrictList input[type=checkbox]');
+  if(!cbs.length){myAlert('⚠️ पहले जिले लोड करें।');return;}
+  cbs.forEach(cb=>{
+    if(cb.checked)window._closedDistricts[cb.value]=true;
+    else delete window._closedDistricts[cb.value];
+  });
+  localStorage.setItem('ps_closed_dists',JSON.stringify(window._closedDistricts));
+
+  // Reload to show updated badges
+  loadApDistricts();
+
+  const msgEl=document.getElementById('apSaveMsg');
+  if(msgEl){msgEl.style.color='#2e7d32';msgEl.textContent='✅ Portal status save हो गया!';}
+  if(typeof checkLockStatus==='function')checkLockStatus();
+}
+
+function saveTimeLimit(){const s=document.getElementById('dpiStartDate').value,e=document.getElementById('dpiEndDate').value;if(!s||!e){myAlert('Please select both dates.');return;}window._psStart=s;window._psEnd=e;localStorage.setItem('ps_config_start',s);localStorage.setItem('ps_config_end',e);updateDeadlineBadge();myAlert('✅ Access period updated.');checkLockStatus();}
+
 function checkLockStatus(){
-  // ✅ RULE 1: DPI hamesha exempt — kabhi lock nahi hoga
   const cu=window.currentUser||currentUser||null;
   if(cu==='DPI'){document.getElementById('lockScreen').style.display='none';return;}
-  // ✅ RULE 2: JD bhi exempt — kabhi lock nahi hoga
-  if(cu&&cu.startsWith('JD')){document.getElementById('lockScreen').style.display='none';return;}
-  // ✅ RULE 3: Koi logged in nahi hai to lockScreen mat dikhao
   if(!cu){document.getElementById('lockScreen').style.display='none';return;}
-  // ✅ RULE 4: Sirf DEO ke liye date check karo
+
+  // ── Check if JD is closed by DPI ──
+  if(cu&&JD_DISTRICTS[cu]){
+    _loadClosedJDs();
+    const closedJDs=window._closedJDs||{};
+    if(closedJDs[cu]){
+      document.getElementById('lockScreen').style.display='flex';
+      document.getElementById('lockMsg').textContent=cu+' का पोर्टल DPI द्वारा बंद कर दिया गया है। अधिक जानकारी के लिए DPI कार्यालय से संपर्क करें।';
+      return;
+    }
+    document.getElementById('lockScreen').style.display='none';
+    return;
+  }
+
+  // ── Check district-based manual portal close (DEO) ──
+  const deoDist=DEO_DISTRICT[cu];
+  if(deoDist){
+    _loadClosedDistricts();
+    const closed=window._closedDistricts||{};
+    if(closed[deoDist]){
+      document.getElementById('lockScreen').style.display='flex';
+      document.getElementById('lockMsg').textContent=deoDist+' जिले का पोर्टल DPI/JD द्वारा बंद कर दिया गया है। अधिक जानकारी के लिए अपने JD कार्यालय से संपर्क करें।';
+      return;
+    }
+  }
+
+  // ── Date-based check ──
   const s=window._psStart,e=window._psEnd;
   if(!s||!e)return;
   const today=new Date().toISOString().split('T')[0];
@@ -1617,7 +1914,8 @@ function checkLogin(){
     if(JD_DISTRICTS[user]){
       document.getElementById('in23').value=user.replace('JD','JD ');
     }
-    if(user==='DPI'){showDpiClearButtons();var tb=document.getElementById('sheetTitleEditBtn');if(tb)tb.style.display='inline-block';var pb=document.getElementById('pwPanelBtn');if(pb)pb.style.display='inline-block';}
+    if(user==='DPI'){showDpiClearButtons();var tb=document.getElementById('sheetTitleEditBtn');if(tb)tb.style.display='inline-block';var pb=document.getElementById('pwPanelBtn');if(pb)pb.style.display='inline-block';var ab=document.getElementById('adminPanelBtn');if(ab)ab.style.display='block';}
+    if(user==='DPI'||(JD_DISTRICTS&&JD_DISTRICTS[user])){var ab2=document.getElementById('adminPanelBtn');if(ab2)ab2.style.display='block';}
     // ─── Scope Badge ───
     updateScopeBadge(user);
     // Rebuild table head to show/hide office-only columns based on role
@@ -1679,6 +1977,8 @@ function logoutUser(){
   var tb=document.getElementById('sheetTitleEditBtn');if(tb)tb.style.display='none';
   var cdBtn=document.getElementById('changeDivisionBtn');if(cdBtn)cdBtn.style.display='none';
   var pb=document.getElementById('pwPanelBtn');if(pb)pb.style.display='none';
+  var ab=document.getElementById('adminPanelBtn');if(ab)ab.style.display='none';
+  closeAdminPanel();
   buildTableHead();buildFilterRow();renderVirtual();
 }
 // ═══════════════════════════════════════════════
@@ -2427,6 +2727,11 @@ const ugSubjectMap = {
   'BBA'            : ['Principles of Management','Business Economics','Financial Accounting','Business Mathematics','Business Law','Marketing Management','Human Resource Management','Financial Management','Organizational Behavior','Business Communication','Operations Management','Entrepreneurship Development','Statistics','Computer Applications'],
   'B.Tech.'        : ['Engineering Mathematics','Engineering Physics','Engineering Chemistry','Basic Electrical Engineering','Basic Electronics Engineering','Engineering Mechanics','Computer Programming','Data Structures','Operating System','Computer Networks','Database Management System','Software Engineering','Environmental Studies','Engineering Graphics'],
   'B.E.'           : ['Engineering Mathematics','Engineering Physics','Engineering Chemistry','Basic Electrical Engineering','Basic Electronics Engineering','Engineering Mechanics','Computer Programming','Data Structures','Operating System','Computer Networks','Database Management System','Software Engineering','Environmental Studies','Engineering Graphics'],
+  'MBBS'           : ['Anatomy','Physiology','Biochemistry','Pathology','Pharmacology','Microbiology','Medicine','Surgery','Obstetrics & Gynaecology'],
+  'LLB'            : ['Constitutional Law','Criminal Law (IPC)','Contract Law','Family Law','Property Law','Company Law','Evidence Act','CPC & CrPC'],
+  'BJMC'           : ['Journalism','Mass Communication','Media Studies','Public Relations (PR)','Advertising','Digital Media'],
+  'BSc Agriculture': ['Agronomy','Soil Science','Plant Breeding & Genetics','Horticulture','Plant Pathology','Entomology'],
+  'BSc Nursing'    : ['Anatomy & Physiology','Nursing Foundations','Community Health Nursing','Medical-Surgical Nursing','Pharmacology','Child Health Nursing'],
   'NIL'            : ['NIL'],
 };
 const allSubjects = ['Biology','Botany','Chemistry','Commerce','Computer Science','Economics','English Literature','Geography','Hindi Literature','History','Home Science','Maths','Physics','Political Science','Psychology','Sanskrit Literature','Sociology','Urdu Literature','Zoology'];
@@ -2489,6 +2794,11 @@ const ugToCounsellingSubject = {
   'BBA': '',
   'B.Tech.': 'Maths',
   'B.E.': 'Maths',
+  'MBBS': 'Science',
+  'LLB': 'Social Science',
+  'BJMC': 'Social Science',
+  'BSc Agriculture': 'Science',
+  'BSc Nursing': 'Science',
 };
 const ugToCounsellingMap = {
   'NIL': 'NIL',
@@ -2500,6 +2810,11 @@ const ugToCounsellingMap = {
   'BBA': 'Maths',
   'B.Sc. In Maths': 'Maths',
   'B.Sc. In Science': 'Science',
+  'MBBS': 'Science',
+  'LLB': 'Social Science',
+  'BJMC': 'Social Science',
+  'BSc Agriculture': 'Science',
+  'BSc Nursing': 'Science',
 };
 const literatureSubjectMap = {
   'Hindi Literature': 'Hindi',
