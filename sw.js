@@ -1,6 +1,6 @@
 // PS Gradation ERP Service Worker
 // Har deploy par CACHE_NAME ka number badlo (v2 -> v3 -> v4) taaki users ko "Update available" banner dikhe.
-const CACHE_NAME = 'ps-gradation-v9';
+const CACHE_NAME = 'ps-gradation-v10';
 
 self.addEventListener('install', function(e) { self.skipWaiting(); });
 self.addEventListener('activate', function(e) {
